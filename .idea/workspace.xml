@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="dcc5edaf-9fd0-45b0-b8db-eee1c04526e4" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="trhy.iws" />
@@ -74,7 +73,7 @@
       <file leaf-file-name="workspace.xml" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="14195">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="14858">
               <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
@@ -140,6 +139,7 @@
         <option value="$PROJECT_DIR$/src/cz/tomkren/trhy/Main.java" />
         <option value="$PROJECT_DIR$/src/cz/tomkren/trhy/Transaction.java" />
         <option value="$PROJECT_DIR$/src/cz/tomkren/trhy/Tabule.java" />
+        <option value="$PROJECT_DIR$/.idea/workspace.xml" />
       </list>
     </option>
   </component>
@@ -410,7 +410,11 @@
       <created>1396105373261</created>
       <updated>1396105373261</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Napojení na intelij">
+      <created>1396105543471</created>
+      <updated>1396105543471</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TodoView" selected-index="4">
