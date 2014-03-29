@@ -10,13 +10,13 @@ import java.util.Map;
 public class Firm {
     
     private String firmID;
-    private Map<Comodity,Elem> inventory;
+    private Map<Commodity,Elem> inventory;
     private double money; // protože se do nich šaha opravdu často,
                           // nedáme je pro efektivitu do mapy 
     
     public Firm (String firmID) {
         this.firmID = firmID;
-        inventory = new HashMap<Comodity, Elem>();
+        inventory = new HashMap<Commodity, Elem>();
         money = 0;
     }
     
@@ -24,7 +24,7 @@ public class Firm {
         return money >= m; 
     }
     
-    public boolean hasEnoughComodity (Comodity c, double num) {
+    public boolean hasEnoughComodity (Commodity c, double num) {
         Elem e = inventory.get(c);
         if (e == null) {return false;}
         return e.getNum() >= num;
@@ -35,7 +35,7 @@ public class Firm {
         return money;
     }
     
-    public double addComodity (Comodity c, double delta) {
+    public double addComodity (Commodity c, double delta) {
         Elem e = inventory.get(c);
         if (e == null) {
             inventory.put(c, new NumElem(delta));
@@ -48,7 +48,7 @@ public class Firm {
         return firmID;
     }
     
-    public Map<Comodity,Elem> getInventoryMap () {
+    public Map<Commodity,Elem> getInventoryMap () {
         return inventory;
     }
     

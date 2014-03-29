@@ -12,14 +12,14 @@ public class Trh {
     private int currentTik;  // současnej čas simulace
     private int numTrans;    // aneb nasledující transaction ID 
     
-    private Map<Comodity,Tabule>    tabs;      // komodita -> tabule tý komodity
+    private Map<Commodity,Tabule>    tabs;      // komodita -> tabule tý komodity
     private Map<String,Firm>        firms;     // firmID   -> majetek tý firmy   
     private Map<String,Set<String>> ownership; // agentID  -> mn. firmID co má
                                                // pozdějc bude fikanějc, aby
                                                // šli i jiný vztahy než má
         
     public Trh () {
-        tabs      = new HashMap<Comodity, Tabule>();
+        tabs      = new HashMap<Commodity, Tabule>();
         firms     = new HashMap<String, Firm>();
         ownership = new HashMap<String, Set<String>>();
         
@@ -34,7 +34,7 @@ public class Trh {
         return numTrans ++;
     }
     
-    public void addTabule (Comodity c) {
+    public void addTabule (Commodity c) {
         tabs.put(c, new Tabule(c));
     }
     
@@ -67,7 +67,7 @@ public class Trh {
     
     public Transaction.CheckResult checkTransactionRequest (Transaction.Request tr) {
         
-        Transaction.TRHead head = tr.getHead();        
+        Transaction.Head head = tr.getHead();
         
         if (!isOwner(head.agentID, head.firmID)) {
             return Transaction.ko("Agent není majitelem firmy.");
@@ -79,10 +79,10 @@ public class Trh {
             if (slow.getPrice() <= 0) {return Transaction.ko("Price must be > 0.");}
         }
         
-        Comodity comodity = head.comodity;
+        Commodity commodity = head.commodity;
         
         // todo : zvážit zda nenahradit vytvořením té tabule radši
-        if (!tabs.containsKey(comodity)){
+        if (!tabs.containsKey(commodity)){
             return Transaction.ko("Tato komodita se na trhu neobchoduje.");
         }
 
@@ -107,7 +107,7 @@ public class Trh {
             double num = sell.getNum();
             if (num <= 0) {return Transaction.ko("Num must be > 0.");}
             
-            if (firm.hasEnoughComodity(comodity,num)) {
+            if (firm.hasEnoughComodity(commodity,num)) {
                 return Transaction.OK;
             } else {
                 return Transaction.ko("Firma nemá požadované množství komodity.");
@@ -119,19 +119,19 @@ public class Trh {
     
     private void subtractFromFirm(Transaction.Request tr) throws TrhException {
         
-        Transaction.TRHead head = tr.getHead();        
-        Comodity comodity = head.comodity;
+        Transaction.Head head = tr.getHead();
+        Commodity commodity = head.commodity;
         Firm firm = firms.get(head.firmID); // opakuje se zbytečně (při čekách už znám) 
                                             // ale zatim na to srát
         
         if (tr instanceof Transaction.Sell) {
             Transaction.Sell sell = (Transaction.Sell) tr;
 
-            double newNum = firm.addComodity(comodity, -sell.getNum() );
+            double newNum = firm.addComodity(commodity, -sell.getNum() );
             
             if (newNum < 0) { 
-                firm.addComodity(comodity, sell.getNum() );
-                throw new TrhException("Komodita " + comodity + " ve firme " +
+                firm.addComodity(commodity, sell.getNum() );
+                throw new TrhException("Komodita " + commodity + " ve firme " +
                     head.firmID + " se dostala pod nulu, operace byla zvracena."+
                     "Bylo by tam mnozstvi " + newNum + ".");
             }
@@ -157,10 +157,10 @@ public class Trh {
         
         // TODO rozdělané
         
-        Transaction.TRHead head = tr.getHead();
-        Comodity comodity = head.comodity;
+        Transaction.Head head = tr.getHead();
+        Commodity commodity = head.commodity;
         
-        Tabule tab = tabs.get(comodity);
+        Tabule tab = tabs.get(commodity);
         
         if (tab == null) {
             throw new TrhException("Požadovaná tabule není na trhu.");

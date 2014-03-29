@@ -10,7 +10,7 @@ import java.util.*;
 
 public class Tabule {
     
-    private Comodity comodity;
+    private Commodity commodity;
 
     private PriorityQueue<Row> supply;
     private PriorityQueue<Row> demand;
@@ -46,8 +46,8 @@ public class Tabule {
     }
 
     
-    public Tabule(Comodity comodity) {
-        this.comodity = comodity;
+    public Tabule(Commodity commodity) {
+        this.commodity = commodity;
         int initialCapacity = 11; //11 je prej default
         supply = new PriorityQueue<Row>(initialCapacity, new MinRowComparator()); 
         demand = new PriorityQueue<Row>(initialCapacity, new MaxRowComparator());
@@ -72,12 +72,21 @@ public class Tabule {
     private List<Transaction.Result> buyZaTrzniCenu (double moneyToSpend, Transaction.Request tr, int transID, int currentTik) {
         return buyZaTrzniCenu_rec(moneyToSpend, tr, transID, currentTik, new LinkedList<Transaction.Result>());
     }
-    
+
+    private final static Transaction.Result.ResultType BUY      = Transaction.Result.ResultType.BUY;
+    private final static Transaction.Result.ResultType SELL     = Transaction.Result.ResultType.SELL;
+    private final static Transaction.Result.ResultType NO_Q_BUY = Transaction.Result.ResultType.NO_Q_BUY;
+
+
     private List<Transaction.Result> buyZaTrzniCenu_rec (double moneyToSpend, Transaction.Request tre, int transID, int currentTik, List<Transaction.Result> acc) {        
         
         // TODO : čečit esli nahodou neni prázdná tabulka!!!!
         
-        if (supply.isEmpty()) { return acc; } // TODO lépe, musíme poslat spešl rezult kterej vrátí peníze
+        if (supply.isEmpty()) {
+            // TODO musíme poslat spešl rezult kterej vrátí peníze
+            acc.add(new Transaction.Result(NO_Q_BUY, transID, tre.getAID(), tre.getFID(), commodity, 0,moneyToSpend, 0, currentTik, currentTik));
+            return acc;
+        }
         
         if (moneyToSpend <= 0) { return acc; } // radši pojistka
 
@@ -88,7 +97,8 @@ public class Tabule {
 
         boolean preteklo = (moneyToSpend > rowValue);
 
-        double numToBuy = preteklo ? rowNum : moneyToSpend/rowPrice ;
+        double numToBuy    = preteklo ? rowNum : moneyToSpend/rowPrice;
+        double moneyForBuy = numToBuy*rowPrice;
 
         if (preteklo) {
             supply.poll();
@@ -99,8 +109,8 @@ public class Tabule {
             }
         }
 
-        acc.add(new Transaction.Result(true,  transID,      tre.getAID(), tre.getFID(), comodity, numToBuy, rowPrice, currentTik,        currentTik ));
-        acc.add(new Transaction.Result(false, row.getTID(), row.getAID(), row.getFID(), comodity, numToBuy, rowPrice, row.getStartTik(), currentTik ));
+        acc.add(new Transaction.Result(BUY,  transID,      tre.getAID(), tre.getFID(), commodity, numToBuy, moneyForBuy , rowPrice, currentTik,        currentTik ));
+        acc.add(new Transaction.Result(SELL, row.getTID(), row.getAID(), row.getFID(), commodity, numToBuy, moneyForBuy , rowPrice, row.getStartTik(), currentTik ));
 
         if (preteklo) {
             return buyZaTrzniCenu_rec(moneyToSpend-rowValue, tre, transID, currentTik, acc);
@@ -120,9 +130,9 @@ public class Tabule {
     public static void main (String[] args) {
         Log.it("Tabule main, hello!");
         
-        Comodity kolac = new BasicComodity("Koláč");
-        
-        Tabule t = new Tabule(kolac);
+        Commodity pie = new Commodity.Basic("Koláč");
+
+        Tabule t = new Tabule(pie);
                
         t.supply.add(new Row(3, "žid",   "Koloniál",  44, 3   ,10));
         t.supply.add(new Row(1, "pekař", "Pekař&Syn", 42, 10  ,1));
@@ -140,12 +150,10 @@ public class Tabule {
         Log.it("\n");
         
         
-        Transaction.Request req = new Transaction.QBuy("otrokář", "OtrociAS", kolac, 420 + 430 );
+        Transaction.Request req = new Transaction.QBuy("otrokář", "OtrociAS", pie, 42000 + 430 );
         List<Transaction.Result> ress = t.add(req,77,1234);
         
-        for (Transaction.Result res : ress) {
-            Log.it(res);
-        }
+        for (Transaction.Result res : ress) { Log.it(res); }
         
         Log.it(t);
         
@@ -155,7 +163,7 @@ public class Tabule {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("\n-- ").append(comodity).append(" ----------\n");
+        sb.append("\n-- ").append(commodity).append(" ----------\n");
         
         Row[] sArr = supply.toArray(new Row[0]);
         Row[] dArr = demand.toArray(new Row[0]);
@@ -171,8 +179,8 @@ public class Tabule {
         
         return sb.toString();
     }
-    
-    
+
+
     
     class MinRowComparator implements Comparator<Row> {
         public int compare(Row r1, Row r2) {
