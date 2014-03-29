@@ -41,7 +41,7 @@ public class Tabule {
         
         @Override
         public String toString() {
-            return "$"+price+" ... "+num+" ks ... "+firmID+"("+agentID+")";
+            return "$"+price+" ... "+num+" ks ... "+firmID+" ("+agentID+") [tid "+transID+" tik "+ tik +"]";
         }
     }
 
@@ -59,18 +59,51 @@ public class Tabule {
         if (tr instanceof Transaction.QBuy) {
             Transaction.QBuy qbuy = (Transaction.QBuy)tr;
             double moneyToSpend = qbuy.getMoney();
-            return buyZaTrzniCenu(moneyToSpend, tr, transID, currentTik);
+            return quickBuy(moneyToSpend, tr, transID, currentTik);
         }
-        
+
+        if (tr instanceof Transaction.SBuy) {
+            return slowBuy((Transaction.SBuy)tr, transID, currentTik);
+        }
+
+        if (tr instanceof Transaction.SSell) {
+            return slowSell((Transaction.SSell)tr, transID, currentTik);
+        }
+
         // ... ostatni připady            
 
         
         return null;
     }
-    
-    
-    private List<Transaction.Result> buyZaTrzniCenu (double moneyToSpend, Transaction.Request tr, int transID, int currentTik) {
-        return buyZaTrzniCenu_rec(moneyToSpend, tr, transID, currentTik, new LinkedList<Transaction.Result>());
+
+    private List<Transaction.Result> slowBuy (Transaction.SBuy tre, int transID, int currentTik) {
+
+        // TODO potřeba ošetřit případ kdy je některá cena nižší než zde uvedená (a rovnou nakoupit!)
+        // TODO udělat asi pomocí zobecneni quickBuy_rec přidanim parametru priceLimit kterej bude pro QBUY nastaven na 0
+
+        double price = tre.getPrice();
+        double num   = tre.getMoney()/price;
+
+        demand.add(new Row(transID, tre.getAID(), tre.getFID(),   price  , num, currentTik));
+
+        return new LinkedList<Transaction.Result>();
+    }
+
+    private List<Transaction.Result> slowSell (Transaction.SSell tre, int transID, int currentTik) {
+
+        // TODO potřeba ošetřit případ kdy je některá cena nižší než zde uvedená (a rovnou prodat!)
+        // TODO udělat asi pomocí zobecneni quickBuy_rec přidanim parametru priceLimit kterej bude pro QBUY nastaven na 0
+
+        double price = tre.getPrice();
+        double num   = tre.getNum();
+
+        supply.add(new Row(transID, tre.getAID(), tre.getFID(),   price  , num, currentTik));
+
+        return new LinkedList<Transaction.Result>();
+    }
+
+    private List<Transaction.Result> quickBuy (double moneyToSpend, Transaction.Request tr, int transID, int currentTik) {
+        return quickBuy_rec(moneyToSpend, tr, transID, currentTik, new LinkedList<Transaction.Result>());
     }
 
     private final static Transaction.Result.ResultType BUY      = Transaction.Result.ResultType.BUY;
@@ -78,7 +111,7 @@ public class Tabule {
     private final static Transaction.Result.ResultType NO_Q_BUY = Transaction.Result.ResultType.NO_Q_BUY;
 
 
-    private List<Transaction.Result> buyZaTrzniCenu_rec (double moneyToSpend, Transaction.Request tre, int transID, int currentTik, List<Transaction.Result> acc) {        
+    private List<Transaction.Result> quickBuy_rec(double moneyToSpend, Transaction.Request tre, int transID, int currentTik, List<Transaction.Result> acc) {
         
         // TODO : čečit esli nahodou neni prázdná tabulka!!!!
         
@@ -113,7 +146,7 @@ public class Tabule {
         acc.add(new Transaction.Result(SELL, row.getTID(), row.getAID(), row.getFID(), commodity, numToBuy, moneyForBuy , rowPrice, row.getStartTik(), currentTik ));
 
         if (preteklo) {
-            return buyZaTrzniCenu_rec(moneyToSpend-rowValue, tre, transID, currentTik, acc);
+            return quickBuy_rec(moneyToSpend - rowValue, tre, transID, currentTik, acc);
         } else {
             return acc;
         }
@@ -143,19 +176,19 @@ public class Tabule {
         t.demand.add(new Row(20, "otrokář", "UKsro",    41.5, 110, 3));
         
         
-        Log.it(t);
+        Log.it().it(t);
         
         Log.it("Best supply price: $" + t.supply.peek().price);
         Log.it("Best demand price: $" + t.demand.peek().price);
         Log.it("\n");
         
         
-        Transaction.Request req = new Transaction.QBuy("otrokář", "OtrociAS", pie, 42000 + 430 );
+        Transaction.Request req = new Transaction.QBuy("otrokář", "OtrociAS", "Koláč", 42000 + 430 );
         List<Transaction.Result> ress = t.add(req,77,1234);
         
         for (Transaction.Result res : ress) { Log.it(res); }
         
-        Log.it(t);
+        Log.it().it(t);
         
     }
     
@@ -163,7 +196,7 @@ public class Tabule {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("\n-- ").append(commodity).append(" ----------\n");
+        sb.append("-- ").append(commodity).append(" --\n");
         
         Row[] sArr = supply.toArray(new Row[0]);
         Row[] dArr = demand.toArray(new Row[0]);
@@ -171,11 +204,12 @@ public class Tabule {
         Arrays.sort(sArr, new MaxRowComparator());
         Arrays.sort(dArr, new MaxRowComparator());
 
-        for (Row r : sArr) { sb.append(r.toString()).append("\n"); } 
-        sb.append("\n");
+        for (Row r : sArr) { sb.append(r.toString()).append("\n"); }
+        sb.append("<>\n");
         for (Row r : dArr) { sb.append(r.toString()).append("\n"); }
         
-        sb.append("-------------------\n");
+        //sb.append("-------------------\n");
+        sb.append(".\n");
         
         return sb.toString();
     }
