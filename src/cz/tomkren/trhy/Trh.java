@@ -241,8 +241,6 @@ public class Trh {
             throw new TrhException("Požadovaná tabule není na trhu.");
         }
 
-
-
         return tab.add(tr, nextTransID(), currentTik);
 
     }
