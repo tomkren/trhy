@@ -106,10 +106,7 @@ public class Trh {
         if (checkResult.isOk()) {
 
             try {
-
                 subtractFromFirm(tr);
-
-
             } catch (TrhException e) {
                 log( "[TRANSACTION FAILED | SUBTRACT EXCEPTION]  " + e.getMessage() );
             }
