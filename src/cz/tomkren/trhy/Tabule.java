@@ -92,7 +92,7 @@ public class Tabule {
     private List<Transaction.Result> slowSell (Transaction.SSell tre, int transID, int currentTik) {
 
         // TODO potřeba ošetřit případ kdy je některá cena nižší než zde uvedená (a rovnou prodat!)
-        // TODO udělat asi pomocí zobecneni quickBuy_rec přidanim parametru priceLimit kterej bude pro QBUY nastaven na 0
+        // TODO udělat asi pomocí zobecneni quickSell_rec přidanim ... analogicky s úpravou ve slow buy
 
         double price = tre.getPrice();
         double num   = tre.getNum();
@@ -111,10 +111,32 @@ public class Tabule {
     private final static Transaction.Result.ResultType NO_Q_BUY = Transaction.Result.ResultType.NO_Q_BUY;
 
 
+    /* TODO Poznámky:
+    *  Zdá se mi potřeba držet si standard čistýho kódu, proto ze všeho nejdřív vyřešim tyhle nedodělaný funkce a pak je
+    *  budu refaktorovat na co nejjednoduší formu bez code repetitions.
+    *
+    *  Jakej je rozdíl mezi slowBuy a quickBuy?
+    *  Fundamentální rozdíl co je činí těžce vzajemně zobecnitelnýma je, že quick se hned vrátí, zatímco když dám
+    *  slowBuy s cenou 0 (pokud by to šlo), tak tam zůstane (pokud je nabídka prázdná, případně uspokojí jen z části)
+    *  to by ale šlo popsat nějakym booleanem stayThere (== isQuick) kterej určuje jestli se po uspokojení toho co jde
+    *  zbytek vrátí jako neuspokojen, nebo se zapíše do tabule.
+    *
+    *  Proto navrhuju udělat zobecněnej buy_rec navíc s parametry priceLimit a stayThere a pak napsat analogicky
+    *  sell_rec, tyto dva pak následně zobecnit do jedný věci.
+    *
+    *  Případně i odstranit rekurzi (nahrazení while cyklem) (mělo by bejt rychlejší, možná že bude i přehlednější).
+    *
+    *
+    * */
+
+
     private List<Transaction.Result> quickBuy_rec(double moneyToSpend, Transaction.Request tre, int transID, int currentTik, List<Transaction.Result> acc) {
-        
-        // TODO : čečit esli nahodou neni prázdná tabulka!!!!
-        
+
+
+        //TODO : možná rozšířit o parametr priceLimit (a přejmenovat na buy_rec), jak je uvedeno v todo k slowBuy
+
+        //TODO : čečit esli nahodou neni prázdná tabulka!!!!
+
         if (supply.isEmpty()) {
             // TODO musíme poslat spešl rezult kterej vrátí peníze
             acc.add(new Transaction.Result(NO_Q_BUY, transID, tre.getAID(), tre.getFID(), commodity, 0,moneyToSpend, 0, currentTik, currentTik));
@@ -145,11 +167,8 @@ public class Tabule {
         acc.add(new Transaction.Result(BUY,  transID,      tre.getAID(), tre.getFID(), commodity, numToBuy, moneyForBuy , rowPrice, currentTik,        currentTik ));
         acc.add(new Transaction.Result(SELL, row.getTID(), row.getAID(), row.getFID(), commodity, numToBuy, moneyForBuy , rowPrice, row.getStartTik(), currentTik ));
 
-        if (preteklo) {
-            return quickBuy_rec(moneyToSpend - rowValue, tre, transID, currentTik, acc);
-        } else {
-            return acc;
-        }
+        if (preteklo) { return quickBuy_rec(moneyToSpend - rowValue, tre, transID, currentTik, acc); }
+        else          { return acc; }
     }
     
  

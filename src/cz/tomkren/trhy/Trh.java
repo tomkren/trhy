@@ -120,6 +120,8 @@ public class Trh {
                 //  TODO (2) vrátit i jako výstup metody send, aby pak agent trhu mohl informovat agenty manažírků.
                 // nesou sebou informaci co je do jakého inventáře potřeba přidat
 
+
+
                 // zatim jen vypíšem:
                 log("TODO opravdu tyto výsledky zpracovat, zatím jen vypíšem:");
                 for (Transaction.Result res : transResults) {
