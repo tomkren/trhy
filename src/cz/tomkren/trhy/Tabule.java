@@ -54,7 +54,7 @@ public class Tabule {
     }
     
     public List<Transaction.Result> add (Transaction.Request tr, int transID , int currentTik) {
-        // TODO rozdelané
+        // TODO rozdělané
       
         if (tr instanceof Transaction.QBuy) {
             Transaction.QBuy qbuy = (Transaction.QBuy)tr;
@@ -70,7 +70,7 @@ public class Tabule {
             return slowSell((Transaction.SSell)tr, transID, currentTik);
         }
 
-        // ... ostatni připady            
+        // ... ostatní případy
 
         
         return null;
@@ -129,6 +129,79 @@ public class Tabule {
     *
     * */
 
+    private List<Transaction.Result> buy (int transID, Transaction.Buy buyTransReq, int currentTik ) {
+
+        boolean isQuick  = buyTransReq instanceof Transaction.Quick;
+        double  buyPrice = 0;
+        double  moneyToSpend = buyTransReq.getMoney();
+        List<Transaction.Result> acc = new LinkedList<Transaction.Result>();
+
+        if (!isQuick) {
+            Transaction.Slow slowTransReq = (Transaction.Slow) buyTransReq ;
+            buyPrice = slowTransReq.getPrice() ;
+        }
+
+        return buy_rec(isQuick, buyPrice, moneyToSpend, (Transaction.Request)buyTransReq, transID, currentTik, acc);
+    }
+
+    private List<Transaction.Result> buy_rec (  boolean                   isQuick         ,
+                                                double                    buyPrice        ,
+                                                double                    moneyToSpend    ,
+                                                Transaction.Request       tre             ,
+                                                int                       transID         ,
+                                                int                       currentTik      ,
+                                                List<Transaction.Result>  acc             ) {
+
+        if (moneyToSpend <= 0) { return acc; } // better safe than sorry
+
+        // ošetří zda neni třeba odeslat zprávu o neutracených penězích z Q_BUY kvůli prázdné nabídce.
+        if (isQuick && supply.isEmpty()) {
+            acc.add(new Transaction.Result(NO_Q_BUY, transID, tre.getAID(), tre.getFID(), commodity, 0,moneyToSpend, 0, currentTik, currentTik));
+            return acc;
+        }
+
+        // vyndáme důležité položky z "nejvýhodnějšího" řádku
+        Row    row      = supply.peek();
+        double rowValue = row.getValue();
+        double rowPrice = row.getPrice();
+        double rowNum   = row.getNum();
+
+        // pro pomalou nákupní transakcí s moc nízkou nákupní cenou (oproti nejlepší nabídce) přidáme nový poptávkový řádek a končíme
+        if (!isQuick && rowPrice > buyPrice) {
+            // pro jistotu ještě zde kontrola kladnosti nákupní ceny
+            if (buyPrice <= 0) {return acc;}
+            // přidáme řádek
+            demand.add(new Row(transID, tre.getAID(), tre.getFID(), buyPrice  , moneyToSpend/buyPrice , currentTik));
+            // a žádné další nákupy se zatím nekonají
+            return acc;
+        }
+
+        // isOverflow znamená, že nákupní request nebude plně uspokojen tímto řádkem
+        boolean isOverflow = (moneyToSpend > rowValue);
+        // kolik kusu tedy koupím
+        double numToBuy = isOverflow ? rowNum : moneyToSpend/rowPrice;
+        // .. a kolik mě to bude stát
+        double moneyForBuy = numToBuy*rowPrice;
+
+        // budeme odebírat řádek, případně ho jen upravovat
+        if (isOverflow) {
+            supply.poll();
+        } else {
+            row.decreaseNum(numToBuy);
+            if (row.getNum() <= 0) { // jsou to doubly, tak by to mohlo jit zaokrouhlením pod
+                supply.poll(); //řádek už je prázdný, vyhodíme
+            }
+        }
+
+        // Musíme vrátit zprávu (Transaction.Result) jak pro nakupujícího, tak pro toho komu ten řádek patřil
+        // (a) zpráva pro nakupujícího
+        // (b) zpráva pro prodávajícího
+        acc.add(new Transaction.Result(BUY,  transID,      tre.getAID(), tre.getFID(), commodity, numToBuy, moneyForBuy , rowPrice, currentTik,        currentTik ));
+        acc.add(new Transaction.Result(SELL, row.getTID(), row.getAID(), row.getFID(), commodity, numToBuy, moneyForBuy , rowPrice, row.getStartTik(), currentTik ));
+
+        if (isOverflow) { return buy_rec(isQuick, buyPrice, moneyToSpend - rowValue, tre, transID, currentTik, acc); }
+        else            { return acc; }
+    }
 
     private List<Transaction.Result> quickBuy_rec(double moneyToSpend, Transaction.Request tre, int transID, int currentTik, List<Transaction.Result> acc) {
 
@@ -251,6 +324,17 @@ public class Tabule {
             if (r1.transID < r2.transID) {return -1;}    
             return 1;
         }        
+    }
+
+    public static class TabuleException extends Exception {
+        private String msg;
+        public TabuleException(String msg) {
+            this.msg = msg;
+        }
+        @Override
+        public String getMessage() {
+            return "[TABULE EXCEPTION] : "+msg;
+        }
     }
     
 
