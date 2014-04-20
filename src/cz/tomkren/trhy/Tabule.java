@@ -129,7 +129,7 @@ public class Tabule {
     *
     * */
 
-    private List<Transaction.Result> buy (int transID, Transaction.Buy buyTransReq, int currentTik ) {
+    private List<Transaction.Result> buy (Transaction.Buy buyTransReq, int transID, int currentTik) {
 
         boolean isQuick  = buyTransReq instanceof Transaction.Quick;
         double  buyPrice = 0;
@@ -201,6 +201,19 @@ public class Tabule {
 
         if (isOverflow) { return buy_rec(isQuick, buyPrice, moneyToSpend - rowValue, tre, transID, currentTik, acc); }
         else            { return acc; }
+    }
+
+    private List<Transaction.Result> sell_rec ( boolean                   isQuick         ,
+                                                double                    sellPrice       ,
+                                                double                    sellNum         ,
+                                                Transaction.Request       tre             ,
+                                                int                       transID         ,
+                                                int                       currentTik      ,
+                                                List<Transaction.Result>  acc             ) {
+
+
+
+        return null;
     }
 
     private List<Transaction.Result> quickBuy_rec(double moneyToSpend, Transaction.Request tre, int transID, int currentTik, List<Transaction.Result> acc) {
