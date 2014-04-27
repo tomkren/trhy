@@ -45,14 +45,219 @@ public class Tabule {
         }
     }
 
-    
     public Tabule(Commodity commodity) {
         this.commodity = commodity;
         int initialCapacity = 11; //11 je prej default
         supply = new PriorityQueue<Row>(initialCapacity, new MinRowComparator()); 
         demand = new PriorityQueue<Row>(initialCapacity, new MaxRowComparator());
     }
-    
+
+    private final static Transaction.Result.ResultType BUY       = Transaction.Result.ResultType.BUY;
+    private final static Transaction.Result.ResultType SELL      = Transaction.Result.ResultType.SELL;
+    private final static Transaction.Result.ResultType NO_Q_BUY  = Transaction.Result.ResultType.NO_Q_BUY;
+    private final static Transaction.Result.ResultType NO_Q_SELL = Transaction.Result.ResultType.NO_Q_SELL;
+
+//......................................
+
+    public List<Trans.Res> addBuy (Trans.Buy buyReq, int transID, int currentTik) {
+        List<Trans.Res> ret = new LinkedList<Trans.Res>();
+
+        double myPrice = buyReq.getPrice();
+        double myMoney = buyReq.getMoney();
+
+
+
+        while (myMoney > 0 && !supply.isEmpty()) {
+
+            Row    row      = supply.peek();
+            double rowPrice = row.getPrice();
+
+
+            if (rowPrice <= myPrice) {
+
+                boolean isOverflow  = myMoney > row.getValue();                      // request nebude plně uspokojen tímto řádkem
+                double  numToBuy    = isOverflow ? row.getNum() : myMoney/rowPrice;  // kolik kusu tedy koupím
+                double  moneyForBuy = numToBuy * rowPrice;                           // .. a kolik mě to bude stát
+
+                if (isOverflow) {
+                    supply.poll();
+                } else {
+                    row.decreaseNum(numToBuy);
+                    if (row.getNum() <= 0) { // jsou to doubly, tak by to mohlo jit zaokrouhlením pod
+                        supply.poll(); //řádek už je prázdný, vyhodíme
+                    }
+                }
+
+            } else { // musí bejt slow
+                addBuyRow(ret, myPrice, myMoney, buyReq, transID, currentTik);
+                return ret;
+            }
+
+        }
+
+        if (myMoney > 0) { // tzn supply is empty
+            if (buyReq.isQuick()) { ret.add(  Trans.mkBuyKO(myMoney, buyReq, transID, currentTik) ); }
+            else                  { addBuyRow(ret, myPrice, myMoney, buyReq, transID, currentTik  ); }
+        }
+
+        return ret;
+    }
+
+    private void addBuyRow (List<Trans.Res> ret, double myPrice, double myMoney, Trans.Buy buyReq, int transID, int currentTik) {
+        Row newRow = new Row(transID, buyReq.getAID(), buyReq.getFID(), myPrice, myMoney/myPrice, currentTik);
+        demand.add(newRow);
+        ret.add( Trans.mkBuyAdd(myMoney, myPrice, buyReq, transID, currentTik) );
+    }
+
+
+    public List<Transaction.Result> add_pokus2 (Transaction.Request tr, int transID , int currentTik) {
+        boolean  isBuy   = tr instanceof Transaction.Buy;
+        boolean  isQuick = tr instanceof Transaction.Quick;
+        double   price   = isQuick ? 0 : ((Transaction.Slow)tr).getPrice() ;
+        double   money   = isBuy ? ((Transaction.Buy)tr).getMoney() : 0;
+        double   num     = isBuy ? 0 : ((Transaction.Sell)tr).getNum() ;
+        List<Transaction.Result> acc = new LinkedList<Transaction.Result>();
+
+        return add_rec(isBuy, isQuick, price, money, num, tr, transID, currentTik, acc);
+    }
+
+    private List<Transaction.Result> add_rec (  boolean                   isBuy           ,
+                                                boolean                   isQuick         ,
+                                                double                    price           ,
+                                                double                    money           ,
+                                                double                    num             ,
+                                                Transaction.Request       tre             ,
+                                                int                       transID         ,
+                                                int                       currentTik      ,
+                                                List<Transaction.Result>  acc             ) {
+        // better safe than sorry
+        if (isBuy) { if (money <= 0) { return acc; } }
+        else       { if (num   <= 0) { return acc; } }
+
+        PriorityQueue<Row> pullQueue = isBuy ? supply : demand;
+        PriorityQueue<Row> pushQueue = isBuy ? demand : supply;
+
+        if (pullQueue.isEmpty()) {
+            if (isQuick) { addQuickFail(acc, isBuy, tre, num, money, transID, currentTik);}
+            else         { addSlowRow(pushQueue, tre, price  , num , transID, currentTik);}
+        } else { // pull row exists
+            Row row = pullQueue.peek();
+
+            // vyndáme důležité položky z "nejvýhodnějšího" řádku
+            double rowValue = row.getValue();
+            double rowPrice = row.getPrice();
+            double rowNum   = row.getNum();
+
+            // rozhodneme zda se řádek použije (nakoupime/prodame s nim) či ne
+            boolean isRowPriceOK = isQuick || // quick je automaticky OK, slow musí být prozkoumána
+                                           (isBuy ?  rowPrice <= price   // pokud nakupuju, snesu jen nižší cenu
+                                                  :  rowPrice >= price); // pokud prodavam, tak jedine za víc
+
+            // tady může být price == 0 pro QUICK
+            boolean isRowBad = isBuy ? rowPrice > price : rowPrice < price;
+
+            if (isQuick) {
+
+            } else { // isSlow
+                if (isRowPriceOK) {
+
+                } else { // isSlow AND row price KO
+                    addSlowRow(pushQueue, tre, price  , num , transID, currentTik);
+                }
+            }
+
+
+        }
+
+        return acc;
+
+        /*
+
+        // todo : udelany debilne
+        // ...
+        // ...
+        // ...
+
+        Row row = null;
+        double rowValue = 0, rowPrice = 0, rowNum = 0;
+        boolean isRowBad; // bud ze row vubec neni, nebo ze je moc drahej
+
+        if (isPullEmpty) {
+            isRowBad = true; // protoze row vubec neni
+        } else {
+            // vyndáme důležité položky z "nejvýhodnějšího" řádku
+            row      = pullQueue.peek();
+            rowValue = row.getValue();
+            rowPrice = row.getPrice();
+            rowNum   = row.getNum();
+
+            isRowBad = isBuy ? rowPrice > price : rowPrice < price;
+        }
+
+        num = isBuy ? money/rowPrice : num;
+
+
+        // pro pomalou transakcí s moc narocnou cenou (oproti nej radku row)
+        // přidáme nový řádek a končíme
+        if (!isQuick && isRowBad) {
+            // pro jistotu ještě zde kontrola kladnosti ceny a mnozstvi
+            if (price <= 0 || num <= 0) {return acc;}
+            // přidáme řádek
+            pushQueue.add(new Row(transID, tre.getAID(), tre.getFID(), price  , num , currentTik));
+            // a žádné další nákupy se zatím nekonají
+            // todo : dava smysl pridat do acc result o pridani radku
+            return acc;
+        }
+
+        // isOverflow znamená, že request nebude plně uspokojen tímto řádkem
+        boolean isOverflow = num > rowNum;
+        // kolik kusu tedy prohodit
+        double numToChange = isOverflow ? rowNum : num;
+        // .. a kolik za to bude penez
+        double moneyToChange = numToChange*rowPrice;
+
+        // budeme odebírat řádek, případně ho jen upravovat
+        if (isOverflow) {
+            pullQueue.poll();
+        } else {
+            row.decreaseNum(numToChange);
+            if (row.getNum() <= 0) { // jsou to doubly, tak by to mohlo jit zaokrouhlením pod
+                pullQueue.poll(); //řádek už je prázdný, vyhodíme
+            }
+        }
+
+        //results pro probehle transakce
+        acc.add(new Transaction.Result(isBuy?BUY:SELL, transID,      tre.getAID(), tre.getFID(), commodity, numToChange, moneyToChange , rowPrice, currentTik,        currentTik ));
+        acc.add(new Transaction.Result(isBuy?SELL:BUY, row.getTID(), row.getAID(), row.getFID(), commodity, numToChange, moneyToChange , rowPrice, row.getStartTik(), currentTik ));
+
+        if (isOverflow) { return add_rec(isBuy, isQuick, price, isBuy ? money - rowValue : 0, isBuy ? 0 : num - rowNum, tre, transID, currentTik, acc); }
+        else            { return acc; }
+
+        */
+    }
+
+    private void addQuickFail (List<Transaction.Result> acc, boolean isBuy, Transaction.Request tre, double num, double money,int transID, int currentTik) {
+        Transaction.Result.ResultType resType = isBuy ? NO_Q_BUY : NO_Q_SELL ;
+        Transaction.Result quickFail = new Transaction.Result(
+            resType, transID, tre.getAID(), tre.getFID(), commodity, num, money, 0, currentTik, currentTik);
+        acc.add(quickFail);
+    }
+
+    private void addSlowRow (PriorityQueue<Row> pushQueue, Transaction.Request tre, double price  , double num , int transID, int currentTik) {
+        if (price <= 0 || num <= 0) {return;}
+        Row slowRow = new Row(transID, tre.getAID(), tre.getFID(), price  , num , currentTik);
+        pushQueue.add(slowRow); // todo : dava smysl pridat do acc result o pridani radku
+    }
+
+
+
+
+// .....................................
+
+
+
+
+
     public List<Transaction.Result> add (Transaction.Request tr, int transID , int currentTik) {
         // TODO rozdělané
       
@@ -105,11 +310,6 @@ public class Tabule {
     private List<Transaction.Result> quickBuy (double moneyToSpend, Transaction.Request tr, int transID, int currentTik) {
         return quickBuy_rec(moneyToSpend, tr, transID, currentTik, new LinkedList<Transaction.Result>());
     }
-
-    private final static Transaction.Result.ResultType BUY      = Transaction.Result.ResultType.BUY;
-    private final static Transaction.Result.ResultType SELL     = Transaction.Result.ResultType.SELL;
-    private final static Transaction.Result.ResultType NO_Q_BUY = Transaction.Result.ResultType.NO_Q_BUY;
-
 
     /* TODO Poznámky:
     *  Zdá se mi potřeba držet si standard čistýho kódu, proto ze všeho nejdřív vyřešim tyhle nedodělaný funkce a pak je

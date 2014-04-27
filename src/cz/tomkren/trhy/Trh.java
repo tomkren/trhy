@@ -28,6 +28,77 @@ public class Trh {
         log = new LinkedList<String>();
     }
 
+
+//~~~~ ~~~~~ ~~~~ ~~~~~ ~~~~ ~~ ~~~~~ ~~~~~ ~~~~~~ ~~~~~ ~~~~
+
+    //  TODO výstup metody send je, aby pak agent trhu mohl informovat agenty manažírků.
+    public List<Transaction.Result> send_new (Transaction.Request tr) {
+
+        log(tr.toString());
+
+        Transaction.CheckResult checkResult = checkTransactionRequest(tr);
+
+        if (checkResult.isOk()) {
+
+            try {
+                subtractFromFirm(tr);
+            } catch (TrhException e) {
+                log( "[TRANSACTION FAILED | SUBTRACT EXCEPTION]  " + e.getMessage() );
+            }
+
+            try {
+
+                List<Transaction.Result> transResults = addToTabule(tr);
+                performResultsUpdate(transResults);
+                return transResults;
+
+            } catch (TrhException e) {
+                log( "[TRANSACTION FAILED | addToTabule EXCEPTION]  " + e.getMessage() );
+                return null;
+            }
+
+        } else {
+            log( "[TRANSACTION FAILED | CHECK]  " + checkResult.getMsg() );
+            return null;
+        }
+
+    }
+
+    private void performResultsUpdate (List<Transaction.Result> rs) {
+        for (Transaction.Result r : rs) {
+            //log(r);
+            performResultUpdate(r);
+        }
+    }
+
+    private void performResultUpdate (Transaction.Result res) {
+        // TODO zpracovat transResults
+        //  TODO (1) přičíst peníze/commodity dle výsledků
+        // nesou sebou informaci co je do jakého inventáře potřeba přidat
+
+        /* todo
+        Tansaction.Result.ResultType resType = ... ;
+        boolean isFail = ... ; //due to NO_Q_* mozna staciv resType
+
+        // plan : vypsat to tu jednotlive a pak fikane sloucit
+        switch (resType) {      // todo : zkontrolovat ze se to tak chova
+            case BUY       : .. // add veci
+            case SELL      : .. // add penize
+            case NO_Q_BUY  : .. // add penize
+            case NO_Q_SELL : .. // add veci
+            default: ..
+        }
+        */
+
+
+    }
+
+
+
+//~~~~ ~~~~~ ~~~~ ~~~~~ ~~~~ ~~ ~~~~~ ~~~~~ ~~~~~~ ~~~~~ ~~~~
+
+
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
