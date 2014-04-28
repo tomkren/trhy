@@ -15,7 +15,7 @@ public class Tabule {
     private PriorityQueue<Row> supply;
     private PriorityQueue<Row> demand;
             
-    public static class Row {
+    private class Row {
         
         int    transID;   // transaction ID
         String agentID;   // agent ID, abych věděl koho informovat
@@ -26,7 +26,11 @@ public class Tabule {
         
         public Row (int tid, String aid, String fid, double p, double n, int t) {
             transID = tid; agentID = aid; firmID  = fid; price = p; num = n; tik = t;
-        } 
+        }
+
+        public Trans.Head getHead () {
+            return new Trans.Head(agentID, firmID, commodity);
+        }
         
         public int    getTID () { return transID; }
         public String getAID () { return agentID; }
@@ -45,6 +49,14 @@ public class Tabule {
         }
     }
 
+    private void addSupplyRow (int transID, String agentID, String firmID, double price, double num, int tik) {
+        supply.add(new Row(transID, agentID, firmID, price, num, tik));
+    }
+
+    private void addDemandRow (int transID, String agentID, String firmID, double price, double num, int tik) {
+        demand.add(new Row(transID, agentID, firmID, price, num, tik));
+    }
+
     public Tabule(Commodity commodity) {
         this.commodity = commodity;
         int initialCapacity = 11; //11 je prej default
@@ -59,56 +71,176 @@ public class Tabule {
 
 //......................................
 
-    public List<Trans.Res> addBuy (Trans.Buy buyReq, int transID, int currentTik) {
+    public List<Trans.Res> add (Trans.Req req, int transID, int currentTik) {
+        if (req instanceof Trans.Buy) { return  addBuy(new  BuyOpts((Trans.Buy) req, transID, currentTik)); }
+        if (req instanceof Trans.Sell){ return addSell(new SellOpts((Trans.Sell)req, transID, currentTik)); }
+        return null;
+    }
+
+
+    private List<Trans.Res> addBuy (BuyOpts buyOpts) {
         List<Trans.Res> ret = new LinkedList<Trans.Res>();
 
+        Trans.Buy buyReq = buyOpts.buyReq;
         double myPrice = buyReq.getPrice();
         double myMoney = buyReq.getMoney();
 
-
-
         while (myMoney > 0 && !supply.isEmpty()) {
 
-            Row    row      = supply.peek();
-            double rowPrice = row.getPrice();
+            Row supplyRow = supply.peek();
 
-
-            if (rowPrice <= myPrice) {
-
-                boolean isOverflow  = myMoney > row.getValue();                      // request nebude plně uspokojen tímto řádkem
-                double  numToBuy    = isOverflow ? row.getNum() : myMoney/rowPrice;  // kolik kusu tedy koupím
-                double  moneyForBuy = numToBuy * rowPrice;                           // .. a kolik mě to bude stát
-
-                if (isOverflow) {
-                    supply.poll();
-                } else {
-                    row.decreaseNum(numToBuy);
-                    if (row.getNum() <= 0) { // jsou to doubly, tak by to mohlo jit zaokrouhlením pod
-                        supply.poll(); //řádek už je prázdný, vyhodíme
-                    }
-                }
-
-            } else { // musí bejt slow
-                addBuyRow(ret, myPrice, myMoney, buyReq, transID, currentTik);
+            if (supplyRow.getPrice() <= myPrice) {
+                myMoney = performBuyExchangeWithSupplyRow(ret, supplyRow, myMoney, buyOpts);
+            } else {
+                addToDemand(ret, myPrice, myMoney, buyOpts);
                 return ret;
             }
-
         }
 
-        if (myMoney > 0) { // tzn supply is empty
-            if (buyReq.isQuick()) { ret.add(  Trans.mkBuyKO(myMoney, buyReq, transID, currentTik) ); }
-            else                  { addBuyRow(ret, myPrice, myMoney, buyReq, transID, currentTik  ); }
+        if (myMoney > 0) {
+            if (buyReq.isQuick()) {
+                addBuyFailResult(ret, myMoney, buyOpts);
+            } else {
+                addToDemand(ret, myPrice, myMoney, buyOpts);
+            }
         }
 
         return ret;
     }
 
-    private void addBuyRow (List<Trans.Res> ret, double myPrice, double myMoney, Trans.Buy buyReq, int transID, int currentTik) {
-        Row newRow = new Row(transID, buyReq.getAID(), buyReq.getFID(), myPrice, myMoney/myPrice, currentTik);
-        demand.add(newRow);
-        ret.add( Trans.mkBuyAdd(myMoney, myPrice, buyReq, transID, currentTik) );
+    private List<Trans.Res> addSell (SellOpts sellOpts) {
+        List<Trans.Res> ret = new LinkedList<Trans.Res>();
+
+        Trans.Sell sellReq = sellOpts.sellReq;
+        double myPrice = sellReq.getPrice();
+        double myNum   = sellReq.getNum();
+
+        while (myNum > 0 && !demand.isEmpty()) {
+
+            Row demandRow = demand.peek();
+
+            if (demandRow.getPrice() >= myPrice) {
+                myNum = performSellExchangeWithDemandRow(ret, demandRow, myNum, sellOpts);
+            } else {
+                addToSupply(ret, myPrice, myNum, sellOpts);
+                return ret;
+            }
+        }
+
+        if (myNum > 0) {
+            if (sellReq.isQuick()) {
+                addSellFailResult(ret, myNum, sellOpts);
+            } else {
+                addToSupply(ret, myPrice, myNum, sellOpts);
+            }
+        }
+
+        return ret;
     }
 
+    private void addToDemand (List<Trans.Res> ret, double myPrice, double myMoney, BuyOpts buyOpts) {
+        String aid = buyOpts.buyReq.getAID();
+        String fid = buyOpts.buyReq.getFID();
+        Row newRow = new Row(buyOpts.transID, aid, fid, myPrice, myMoney/myPrice, buyOpts.currentTik);
+
+        ret.add( Trans.mkBuyAddResult(myMoney, myPrice, buyOpts.buyReq, buyOpts.transID, buyOpts.currentTik) );
+        demand.add(newRow);
+    }
+
+    private void addToSupply (List<Trans.Res> ret, double myPrice, double myNum, SellOpts sellOpts) {
+        String aid = sellOpts.sellReq.getAID();
+        String fid = sellOpts.sellReq.getFID();
+        Row newRow = new Row(sellOpts.transID, aid, fid, myPrice, myNum, sellOpts.currentTik);
+
+        ret.add( Trans.mkSellAddResult(myNum, myPrice, sellOpts.sellReq, sellOpts.transID, sellOpts.currentTik) );
+        supply.add(newRow);
+    }
+
+    private void addBuyFailResult (List<Trans.Res> ret, double myMoney, BuyOpts buyOpts) {
+        ret.add( Trans.mkBuyFailResult(myMoney, buyOpts.buyReq, buyOpts.transID, buyOpts.currentTik) );
+    }
+
+    private void addSellFailResult (List<Trans.Res> ret, double myNum, SellOpts sellOpts) {
+        ret.add( Trans.mkSellFailResult(myNum, sellOpts.sellReq, sellOpts.transID, sellOpts.currentTik) );
+    }
+
+    private double performBuyExchangeWithSupplyRow (List<Trans.Res> ret, Row row, double myMoney, BuyOpts buyOpts) {
+
+        Trans.Buy buyReq = buyOpts.buyReq ;
+        int transID      = buyOpts.transID;
+        int currentTik   = buyOpts.currentTik;
+
+        double  rowPrice    = row.getPrice();
+        boolean isOverflow  = myMoney > row.getValue();                      // request nebude plně uspokojen tímto řádkem
+        double  numToBuy    = isOverflow ? row.getNum() : myMoney/rowPrice;  // kolik kusu tedy koupím
+        double  moneyForBuy = numToBuy * rowPrice;                           // .. a kolik mě to bude stát
+
+        if (isOverflow) {
+            supply.poll();
+        } else {
+            row.decreaseNum(numToBuy);
+            if (row.getNum() <= 0) {
+                supply.poll();
+            }
+        }
+
+        ret.add( new Trans.Res(Trans.Dir.BUY,  Trans.Status.OK, rowPrice, numToBuy, moneyForBuy, buyReq.getHead(), transID, currentTik,        currentTik) );
+        ret.add( new Trans.Res(Trans.Dir.SELL, Trans.Status.OK, rowPrice, numToBuy, moneyForBuy, row.getHead()   , transID, row.getStartTik(), currentTik) );
+
+        return myMoney - moneyForBuy;
+    }
+
+    private double performSellExchangeWithDemandRow (List<Trans.Res> ret, Row row, double myNum, SellOpts sellOpts) {
+
+        Trans.Sell sellReq = sellOpts.sellReq ;
+        int transID        = sellOpts.transID;
+        int currentTik     = sellOpts.currentTik;
+
+        double  rowPrice     = row.getPrice();
+        boolean isOverflow   = myNum > row.getNum();               // request nebude plně uspokojen tímto poptávkovým řádkem
+        double  numToSell    = isOverflow ? row.getNum() : myNum;  // ... kolik kusu prodám
+        double  moneyForSell = numToSell * rowPrice;               // ... a kolik za to dostanu
+
+        if (isOverflow) {
+            demand.poll();
+        } else {
+            row.decreaseNum(numToSell);
+            if (row.getNum() <= 0) {
+                demand.poll();
+            }
+        }
+
+        ret.add( new Trans.Res(Trans.Dir.SELL, Trans.Status.OK, rowPrice, numToSell, moneyForSell, sellReq.getHead(), transID, currentTik,        currentTik) );
+        ret.add( new Trans.Res(Trans.Dir.BUY , Trans.Status.OK, rowPrice, numToSell, moneyForSell, row.getHead()    , transID, row.getStartTik(), currentTik) );
+
+        return myNum - numToSell;
+    }
+
+    public static class BuyOpts {
+        private Trans.Buy buyReq;
+        private int       transID;
+        private int       currentTik;
+
+        public BuyOpts(Trans.Buy buyReq, int transID, int currentTik) {
+            this.buyReq = buyReq;
+            this.transID = transID;
+            this.currentTik = currentTik;
+        }
+    }
+
+    public static class SellOpts {
+        private Trans.Sell sellReq;
+        private int       transID;
+        private int       currentTik;
+
+        public SellOpts(Trans.Sell sellReq, int transID, int currentTik) {
+            this.sellReq = sellReq;
+            this.transID = transID;
+            this.currentTik = currentTik;
+        }
+    }
+
+  // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     public List<Transaction.Result> add_pokus2 (Transaction.Request tr, int transID , int currentTik) {
         boolean  isBuy   = tr instanceof Transaction.Buy;
@@ -258,7 +390,7 @@ public class Tabule {
 
 
 
-    public List<Transaction.Result> add (Transaction.Request tr, int transID , int currentTik) {
+    public List<Transaction.Result> add_old (Transaction.Request tr, int transID , int currentTik) {
         // TODO rozdělané
       
         if (tr instanceof Transaction.QBuy) {
@@ -471,14 +603,14 @@ public class Tabule {
         Commodity pie = new Commodity.Basic("Koláč");
 
         Tabule t = new Tabule(pie);
-               
-        t.supply.add(new Row(3, "žid",   "Koloniál",  44, 3   ,10));
-        t.supply.add(new Row(1, "pekař", "Pekař&Syn", 42, 10  ,1));
-        t.supply.add(new Row(2, "pekař2", "Pekař&Syn2", 43, 110 ,5));
 
-        t.demand.add(new Row(30, "otrokář", "UKsro",    41  ,   3, 100));
-        t.demand.add(new Row(10, "žid",     "Koloniál", 40  ,  10, 20));
-        t.demand.add(new Row(20, "otrokář", "UKsro",    41.5, 110, 3));
+        t.addSupplyRow(3, "žid",   "Koloniál",  44, 3   ,10);
+        t.addSupplyRow(1, "pekař", "Pekař&Syn", 42, 10  ,1);
+        t.addSupplyRow(2, "pekař2", "Pekař&Syn2", 43, 110 ,5);
+
+        t.addDemandRow(30, "otrokář", "UKsro",    41  ,   3, 100);
+        t.addDemandRow(10, "žid",     "Koloniál", 40  ,  10, 20 );
+        t.addDemandRow(20, "otrokář", "UKsro",    41.5, 110, 3  );
         
         
         Log.it().it(t);
@@ -489,7 +621,7 @@ public class Tabule {
         
         
         Transaction.Request req = new Transaction.QBuy("otrokář", "OtrociAS", "Koláč", 42000 + 430 );
-        List<Transaction.Result> ress = t.add(req,77,1234);
+        List<Transaction.Result> ress = t.add_old(req, 77, 1234);
         
         for (Transaction.Result res : ress) { Log.it(res); }
         

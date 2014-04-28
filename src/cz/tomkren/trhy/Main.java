@@ -1,8 +1,5 @@
 package cz.tomkren.trhy;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class Main {
 
     public static void main(String[] args) {
@@ -39,9 +36,13 @@ public class Main {
 
             Log.it().it(trh);
 
-            trh.send(new Transaction.SBuy ("Penuel Katz", "Koloniál Katz","Flour",1000,10));
-            trh.send(new Transaction.SSell("Václav Rolný","Pole a.s.",    "Flour",200 ,12));
-            trh.send(new Transaction.QBuy ("Penuel Katz", "Koloniál Katz","Flour",24));
+            //trh.send_old(new Transaction.SBuy("Penuel Katz", "Koloniál Katz", "Flour", 1000, 10));
+            //trh.send_old(new Transaction.SSell("Václav Rolný", "Pole a.s.", "Flour", 200, 12));
+            //trh.send_old(new Transaction.QBuy("Penuel Katz", "Koloniál Katz", "Flour", 24));
+
+            trh.send(Trans.mkSlowBuy( "Penuel Katz",  "Koloniál Katz", "Flour", 1000, 10));
+            trh.send(Trans.mkSlowSell("Václav Rolný", "Pole a.s.",     "Flour", 200, 12));
+            trh.send(Trans.mkQuickBuy("Penuel Katz",  "Koloniál Katz", "Flour", 24));
 
 
             Log.it().it(trh);

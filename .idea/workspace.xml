@@ -5,7 +5,6 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cz/tomkren/trhy/Main.java" afterPath="$PROJECT_DIR$/src/cz/tomkren/trhy/Main.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cz/tomkren/trhy/Tabule.java" afterPath="$PROJECT_DIR$/src/cz/tomkren/trhy/Tabule.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cz/tomkren/trhy/Trans.java" afterPath="$PROJECT_DIR$/src/cz/tomkren/trhy/Trans.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cz/tomkren/trhy/Transaction.java" afterPath="$PROJECT_DIR$/src/cz/tomkren/trhy/Transaction.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cz/tomkren/trhy/Trh.java" afterPath="$PROJECT_DIR$/src/cz/tomkren/trhy/Trh.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dictionaries/sekol.xml" afterPath="$PROJECT_DIR$/.idea/dictionaries/sekol.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
@@ -480,7 +479,11 @@
       <created>1397996911137</created>
       <updated>1397996911137</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="dodelana nová tabule.add a trh.send, potřeba pořadně prozkoušet">
+      <created>1398714358598</created>
+      <updated>1398714358598</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TodoView" selected-index="0">
@@ -553,7 +556,8 @@
     <MESSAGE value="trhosti" />
     <MESSAGE value="Další trhosti." />
     <MESSAGE value="Příprava jednotné tabulkové funkce buy místo quickBuy a slowBuy" />
-    <option name="LAST_COMMIT_MESSAGE" value="Příprava jednotné tabulkové funkce buy místo quickBuy a slowBuy" />
+    <MESSAGE value="dodelana nová tabule.add a trh.send, potřeba pořadně prozkoušet" />
+    <option name="LAST_COMMIT_MESSAGE" value="dodelana nová tabule.add a trh.send, potřeba pořadně prozkoušet" />
     <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.7964912" />
   </component>
   <component name="XDebuggerManager">
