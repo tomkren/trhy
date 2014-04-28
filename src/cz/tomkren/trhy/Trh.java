@@ -170,48 +170,7 @@ public class Trh {
         log("ADD FIRM \'"+firmID+"\'");
     }
 
-    public void send_old(Transaction.Request tr) {
 
-        log(tr.toString());
-
-        Transaction.CheckResult checkResult = checkTransactionRequest(tr);
-
-        if (checkResult.isOk()) {
-
-            try {
-                subtractFromFirm_old(tr);
-            } catch (TrhException e) {
-                log( "[TRANSACTION FAILED | SUBTRACT EXCEPTION]  " + e.getMessage() );
-            }
-
-            try {
-
-                List<Transaction.Result> transResults = addToTabule_old(tr);
-
-
-
-                // TODO zpracovat transResults
-                //  TODO (1) přičíst peníze/commodity dle výsledků
-                //  TODO (2) vrátit i jako výstup metody send_old, aby pak agent trhu mohl informovat agenty manažírků.
-                // nesou sebou informaci co je do jakého inventáře potřeba přidat
-
-
-
-                // zatim jen vypíšem:
-                log("TODO opravdu tyto výsledky zpracovat, zatím jen vypíšem:");
-                for (Transaction.Result res : transResults) {
-                    log(res);
-                }
-
-            } catch (TrhException e) {
-                log( "[TRANSACTION FAILED | addToTabule EXCEPTION]  " + e.getMessage() );
-            }
-
-        } else {
-            log( "[TRANSACTION FAILED | CHECK]  " + checkResult.getMsg() );
-        }
-
-    }
 
     public boolean isOwner (String agentID, String firmID) {
         Set<String> hisFirms = ownership.get(agentID);
@@ -267,57 +226,7 @@ public class Trh {
         return Trans.ko("Unsupported transaction request format.");
     }
 
-    public Transaction.CheckResult checkTransactionRequest (Transaction.Request tr) {
-        
-        Transaction.Head head = tr.getHead();
-        
-        if (!isOwner(head.agentID, head.firmID)) {
-            return Transaction.ko("Agent není majitelem firmy.");
-        }
-        
-        // todo : zvážit zda má opravdu smysl tohle zakazovat...
-        if (tr instanceof Transaction.Slow) {
-            Transaction.Slow slow = (Transaction.Slow) tr;
-            if (slow.getPrice() <= 0) {return Transaction.ko("Price must be > 0.");}
-        }
-        
-        Commodity commodity = head.commodity;
-        
-        // todo : zvážit zda nenahradit vytvořením té tabule radši
-        if (!tabs.containsKey(commodity.getName())){
-            return Transaction.ko("Tato komodita se na trhu neobchoduje.");
-        }
 
-        Firm firm = firms.get(head.firmID);
-        
-        if (tr instanceof Transaction.Buy) {
-            Transaction.Buy buy = (Transaction.Buy) tr;
-            
-            double money = buy.getMoney();
-            if (money <= 0) {return Transaction.ko("Money must be > 0.");}
-            
-            if (firm.hasEnoughMoney(money)) {
-                return Transaction.OK;
-            } else {
-                return Transaction.ko("Firma nemá požadované množství peněz.");
-            }
-        }
-        
-        if (tr instanceof Transaction.Sell) {
-            Transaction.Sell sell = (Transaction.Sell) tr;
-
-            double num = sell.getNum();
-            if (num <= 0) {return Transaction.ko("Num must be > 0.");}
-            
-            if (firm.hasEnoughComodity(commodity.getName(),num)) {
-                return Transaction.OK;
-            } else {
-                return Transaction.ko("Firma nemá požadované množství komodity.");
-            }
-        }
-        
-        return Transaction.ko("Unsupported transaction request format.");
-    }
 
     private void subtractFromFirm(Trans.Req req) throws TrhException {
 
@@ -353,62 +262,12 @@ public class Trh {
 
     }
 
-    private void subtractFromFirm_old(Transaction.Request tr) throws TrhException {
-        
-        Transaction.Head head = tr.getHead();
-        Commodity commodity = head.commodity;
-        Firm firm = firms.get(head.firmID); // opakuje se zbytečně (při čekách už znám) 
-                                            // ale zatim na to srát
-        
-        if (tr instanceof Transaction.Sell) {
-            Transaction.Sell sell = (Transaction.Sell) tr;
-
-            double newNum = firm.addComodity(commodity, -sell.getNum() );
-            
-            if (newNum < 0) { 
-                firm.addComodity(commodity, sell.getNum() );
-                throw new TrhException("Komodita " + commodity + " ve firme " +
-                    head.firmID + " se dostala pod nulu, operace byla zvracena."+
-                    "Bylo by tam mnozstvi " + newNum + ".");
-            }
-            
-            
-        } else if (tr instanceof Transaction.Buy) {
-            Transaction.Buy buy = (Transaction.Buy) tr;
-            
-            double newMoney = firm.addMoney(-buy.getMoney());
-            
-            if (newMoney < 0) {
-                firm.addMoney( buy.getMoney() );
-                throw new TrhException("Peníze ve firme " +
-                    head.firmID + " se dostali pod nulu, operace byla zvracena."+
-                    "Bylo by tam $" + newMoney + ".");                
-            }
-        }
-        
-        
-    }
-
     private List<Trans.Res> addToTabule(Trans.Req req) throws TrhException {
         Tabule tab = tabs.get(req.getComoName());
         if (tab == null) { throw new TrhException("Požadovaná tabule není na trhu."); }
 
         return tab.add(req, nextTransID(), currentTik);
     }
-
-    private List<Transaction.Result> addToTabule_old(Transaction.Request tr) throws TrhException {
-
-        Tabule tab = tabs.get(tr.getHead().getComo().getName());
-        
-        if (tab == null) {
-            throw new TrhException("Požadovaná tabule není na trhu.");
-        }
-
-        return tab.add_old(tr, nextTransID(), currentTik);
-
-    }
-    
-    
     
     public static class TrhException extends Exception {
 
