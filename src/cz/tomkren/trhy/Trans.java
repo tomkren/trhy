@@ -82,7 +82,7 @@ public class Trans {
 
 
     public static enum Dir    {BUY, SELL}
-    public static enum Status {ADD, OK , KO}
+    public static enum Status {ADD, EXCHANGE, FAIL}
 
     public static class Res {
 
@@ -123,7 +123,7 @@ public class Trans {
     public static Res mkBuyFailResult(double money, Buy buyReq, int transID, int currentTik) {
         double price = Double.POSITIVE_INFINITY; // lze jen při QBUY
         double num   = 0;                        // nic tam neměli
-        return new Res(Dir.BUY, Status.KO, price, num, money, buyReq.getHead(), transID, currentTik, currentTik);
+        return new Res(Dir.BUY, Status.FAIL, price, num, money, buyReq.getHead(), transID, currentTik, currentTik);
     }
 
     public static Res mkSellAddResult(double num, double price, Sell sellReq, int transID, int currentTik) {
@@ -134,7 +134,7 @@ public class Trans {
     public static Res mkSellFailResult(double num, Sell sellReq, int transID, int currentTik) {
         double price = Double.NEGATIVE_INFINITY; // lze jen při QSELL
         double money = 0;                        // nikdo to nechtěl
-        return new Res(Dir.SELL, Status.KO, price, num, money, sellReq.getHead(), transID, currentTik, currentTik);
+        return new Res(Dir.SELL, Status.FAIL, price, num, money, sellReq.getHead(), transID, currentTik, currentTik);
     }
 
 

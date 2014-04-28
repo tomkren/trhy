@@ -174,8 +174,8 @@ public class Tabule {
             }
         }
 
-        ret.add( new Trans.Res(Trans.Dir.BUY,  Trans.Status.OK, rowPrice, numToBuy, moneyForBuy, buyReq.getHead(), transID, currentTik,        currentTik) );
-        ret.add( new Trans.Res(Trans.Dir.SELL, Trans.Status.OK, rowPrice, numToBuy, moneyForBuy, row.getHead()   , transID, row.getStartTik(), currentTik) );
+        ret.add( new Trans.Res(Trans.Dir.BUY,  Trans.Status.EXCHANGE, rowPrice, numToBuy, moneyForBuy, buyReq.getHead(), transID, currentTik,        currentTik) );
+        ret.add( new Trans.Res(Trans.Dir.SELL, Trans.Status.EXCHANGE, rowPrice, numToBuy, moneyForBuy, row.getHead()   , transID, row.getStartTik(), currentTik) );
 
         return myMoney - moneyForBuy;
     }
@@ -200,8 +200,8 @@ public class Tabule {
             }
         }
 
-        ret.add( new Trans.Res(Trans.Dir.SELL, Trans.Status.OK, rowPrice, numToSell, moneyForSell, sellReq.getHead(), transID, currentTik,        currentTik) );
-        ret.add( new Trans.Res(Trans.Dir.BUY , Trans.Status.OK, rowPrice, numToSell, moneyForSell, row.getHead()    , transID, row.getStartTik(), currentTik) );
+        ret.add( new Trans.Res(Trans.Dir.SELL, Trans.Status.EXCHANGE, rowPrice, numToSell, moneyForSell, sellReq.getHead(), transID, currentTik,        currentTik) );
+        ret.add( new Trans.Res(Trans.Dir.BUY , Trans.Status.EXCHANGE, rowPrice, numToSell, moneyForSell, row.getHead()    , transID, row.getStartTik(), currentTik) );
 
         return myNum - numToSell;
     }

@@ -31,7 +31,7 @@ public class Trh {
 
 //~~~~ ~~~~~ ~~~~ ~~~~~ ~~~~ ~~ ~~~~~ ~~~~~ ~~~~~~ ~~~~~ ~~~~
 
-    //  TODO výstup metody send_old je, aby pak agent trhu mohl informovat agenty manažírků.
+    //  TODO výstup metody send je, aby pak agent trhu mohl informovat agenty manažírků.
     public List<Trans.Res> send (Trans.Req req) {
 
         log(req.toString());
@@ -128,6 +128,10 @@ public class Trh {
         Log.it("<TRH-LOG>        "+o);
         log.add(o.toString());
     }
+
+    public List<String> getLog() {
+        return log;
+    }
     
     public void incrementTik () {currentTik ++;}
     public int getTik () {return currentTik;}
@@ -174,8 +178,7 @@ public class Trh {
 
     public boolean isOwner (String agentID, String firmID) {
         Set<String> hisFirms = ownership.get(agentID);
-        if (hisFirms == null) {return false;}
-        return hisFirms.contains(firmID);
+        return hisFirms != null && hisFirms.contains(firmID);
     }
 
     public Trans.CheckStatus checkTransReq (Trans.Req req) {
