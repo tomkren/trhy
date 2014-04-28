@@ -81,8 +81,17 @@ public class Trans {
 
 
 
-    public static enum Dir    {BUY, SELL}
-    public static enum Status {ADD, EXCHANGE, FAIL}
+    public static enum Dir           {BUY, SELL}
+    public static enum Status        {ADD, EXCHANGE, FAIL}
+    public static enum EffectType {ADD_MONEY, ADD_COMMODITY, NOTHING}
+
+    private static class ResEffect {
+        private EffectType type;
+        private double        val;
+        public ResEffect (EffectType type, double val) { this.type = type; this.val = val; }
+        public EffectType getType() {return type;}
+        public double getVal() {return val;}
+    }
 
     public static class Res {
 
@@ -97,21 +106,41 @@ public class Trans {
         private int    startTik;
         private int    finishTik;
 
+        private ResEffect resEffect;
+
         public Res (Dir dir, Status status, double price, double num, double money, Head head, int transID, int startTik, int finishTik) {
-            this.dir       = dir      ;
-            this.status    = status   ;
-            this.price     = price    ;
-            this.num       = num      ;
-            this.money     = money    ;
-            this.head      = head     ;
-            this.transID   = transID  ;
-            this.startTik  = startTik ;
-            this.finishTik = finishTik;
+            this.dir       = dir       ;
+            this.status    = status    ;
+            this.price     = price     ;
+            this.num       = num       ;
+            this.money     = money     ;
+            this.head      = head      ;
+            this.transID   = transID   ;
+            this.startTik  = startTik  ;
+            this.finishTik = finishTik ;
+
+            resEffect = getResEffect();
+        }
+
+        public EffectType getEffectType() {return resEffect.getType();}
+        public double getEffectVal()      {return resEffect.getVal(); }
+
+        public String    getFID()  {return head.getFID(); }
+        public Commodity getComo() {return head.getComo();}
+
+        private ResEffect getResEffect () {
+            switch (status) {
+                case EXCHANGE : switch (dir) { case BUY  : return new ResEffect(EffectType.ADD_COMMODITY , num   );
+                                               case SELL : return new ResEffect(EffectType.ADD_MONEY     , money ); }
+                case FAIL     : switch (dir) { case BUY  : return new ResEffect(EffectType.ADD_MONEY     , money );
+                                               case SELL:  return new ResEffect(EffectType.ADD_COMMODITY , num   ); }
+                default:                                   return new ResEffect(EffectType.NOTHING       , 0     );
+            }
         }
 
         @Override
         public String toString() {
-            return "[ "+ dir.toString() +" "+ status.toString() +" #$"+ money +" $"+price+" #"+num +"]";
+            return "[ "+ dir.toString() +" "+ status.toString() +" #$"+ money +" $"+price+" #"+num +"] => "+getEffectType()+" "+getEffectVal();
         }
     }
 

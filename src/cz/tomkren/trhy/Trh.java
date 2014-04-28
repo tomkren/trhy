@@ -74,25 +74,15 @@ public class Trh {
 
         log("  "+res);
 
-        // TODO zpracovat transResults
-        //  TODO (1) přičíst peníze/commodity dle výsledků
-        // nesou sebou informaci co je do jakého inventáře potřeba přidat
+        Trans.EffectType effectType = res.getEffectType();
+        if (effectType == Trans.EffectType.NOTHING) {return;}
 
-        /* todo
-        Tansaction.Result.ResultType resType = ... ;
-        boolean isFail = ... ; //due to NO_Q_* mozna staciv resType
+        Firm firm = firms.get( res.getFID() ); // todo pokud by byla možnost že se firma odhlásí z trhu, pak by se měla čekovat existence
 
-        // plan : vypsat to tu jednotlive a pak fikane sloucit
-        switch (resType) {      // todo : zkontrolovat ze se to tak chova
-            case BUY       : .. // add veci
-            case SELL      : .. // add penize
-            case NO_Q_BUY  : .. // add penize
-            case NO_Q_SELL : .. // add veci
-            default: ..
+        switch (effectType) {
+            case ADD_COMMODITY : firm.addComodity(res.getComo(), res.getEffectVal() ); break;
+            case ADD_MONEY     : firm.addMoney(                  res.getEffectVal() ); break;
         }
-        */
-
-
     }
 
 
