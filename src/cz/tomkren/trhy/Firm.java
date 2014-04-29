@@ -11,6 +11,7 @@ public class Firm {
     
     private String firmID;
     private Map<String,Elem> inventory;
+
     private double money; // protože se do nich šaha opravdu často,
                           // nedáme je pro efektivitu do mapy 
     
@@ -43,7 +44,13 @@ public class Firm {
             sb.append(key+ " ... "+value.getNum() + "\n");
         }
 
+        //sb.append("... ").append( getInventoryDump() ).append("\n");
+
         return sb.append("\n").toString();
+    }
+
+    public InventoryDump getInventoryDump() {
+        return new InventoryDump(this);
     }
 
     public boolean hasEnoughMoney (double m) {
@@ -77,6 +84,7 @@ public class Firm {
     public Map<String,Elem> getInventoryMap () {
         return inventory;
     }
+    public double getMoney() { return money; }
     
     public static interface Elem {
         public Commodity getCommodity();

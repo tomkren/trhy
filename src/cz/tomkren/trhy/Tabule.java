@@ -14,18 +14,21 @@ public class Tabule {
 
     private PriorityQueue<Row> supply;
     private PriorityQueue<Row> demand;
-            
-    private class Row {
+
+    public static enum RowType {SUPPLY, DEMAND}
+
+    private class Row implements InventoryDump.Dumpable {
         
-        int    transID;   // transaction ID
-        String agentID;   // agent ID, abych věděl koho informovat
-        String firmID;    // firm ID
-        double price;     // price
-        double num;       // number of items
-        int    tik;       // tik zadání
+        private int     transID;   // transaction ID
+        private String  agentID;   // agent ID, abych věděl koho informovat
+        private String  firmID;    // firm ID
+        private double  price;     // price
+        private double  num;       // number of items
+        private int     tik;       // tik zadání
+        private RowType rowType;
         
-        public Row (int tid, String aid, String fid, double p, double n, int t) {
-            transID = tid; agentID = aid; firmID  = fid; price = p; num = n; tik = t;
+        public Row (RowType type, int tid, String aid, String fid, double p, double n, int t) {
+            rowType = type; transID = tid; agentID = aid; firmID  = fid; price = p; num = n; tik = t;
         }
 
         public Trans.Head getHead () {
@@ -47,12 +50,20 @@ public class Tabule {
         public String toString() {
             return "$"+price+" ... "+num+" ks ... "+getFID()+" ("+getAID()+") [tid "+getTID()+" tik "+ tik +"]";
         }
+
+        @Override
+        public Map.Entry<String, Double> dump() {
+            boolean isSupply = rowType == RowType.SUPPLY ;
+            String key = isSupply ? commodity.getName() : "$"       ;
+            Double val = isSupply ? getNum()            : getValue();
+            return new AbstractMap.SimpleImmutableEntry<String, Double>(key, val);
+        }
     }
     private void addSupplyRow (int transID, String agentID, String firmID, double price, double num, int tik) {
-        supply.add(new Row(transID, agentID, firmID, price, num, tik));
+        supply.add(new Row(RowType.SUPPLY,transID, agentID, firmID, price, num, tik));
     }
     private void addDemandRow (int transID, String agentID, String firmID, double price, double num, int tik) {
-        demand.add(new Row(transID, agentID, firmID, price, num, tik));
+        demand.add(new Row(RowType.DEMAND,transID, agentID, firmID, price, num, tik));
     }
 
     public Tabule(Commodity commodity) {
@@ -131,7 +142,7 @@ public class Tabule {
     private void addToDemand (List<Trans.Res> ret, double myPrice, double myMoney, BuyOpts buyOpts) {
         String aid = buyOpts.buyReq.getAID();
         String fid = buyOpts.buyReq.getFID();
-        Row newRow = new Row(buyOpts.transID, aid, fid, myPrice, myMoney/myPrice, buyOpts.currentTik);
+        Row newRow = new Row(RowType.DEMAND,buyOpts.transID, aid, fid, myPrice, myMoney/myPrice, buyOpts.currentTik);
 
         ret.add( Trans.mkBuyAddResult(myMoney, myPrice, buyOpts.buyReq, buyOpts.transID, buyOpts.currentTik) );
         demand.add(newRow);
@@ -140,7 +151,7 @@ public class Tabule {
     private void addToSupply (List<Trans.Res> ret, double myPrice, double myNum, SellOpts sellOpts) {
         String aid = sellOpts.sellReq.getAID();
         String fid = sellOpts.sellReq.getFID();
-        Row newRow = new Row(sellOpts.transID, aid, fid, myPrice, myNum, sellOpts.currentTik);
+        Row newRow = new Row(RowType.SUPPLY ,sellOpts.transID, aid, fid, myPrice, myNum, sellOpts.currentTik);
 
         ret.add( Trans.mkSellAddResult(myNum, myPrice, sellOpts.sellReq, sellOpts.transID, sellOpts.currentTik) );
         supply.add(newRow);
@@ -232,6 +243,15 @@ public class Tabule {
 
 
 
+    public InventoryDump getInventoryDump() {
+        Collection<? extends InventoryDump.Dumpable> supplyCol = supply;
+        Collection<? extends InventoryDump.Dumpable> demandCol = demand;
+
+        InventoryDump ret = new InventoryDump(supplyCol);
+        ret.add(new InventoryDump(demandCol));
+
+        return ret;
+    }
     
     public static void main (String[] args) {
         Log.it("Tabule main, hello!");
@@ -282,8 +302,9 @@ public class Tabule {
         for (Row r : sArr) { sb.append(r.toString()).append("\n"); }
         sb.append("<>\n");
         for (Row r : dArr) { sb.append(r.toString()).append("\n"); }
-        
-        //sb.append("-------------------\n");
+
+        //sb.append("...").append( getInventoryDump() );
+
         sb.append(".\n");
         
         return sb.toString();

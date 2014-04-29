@@ -35,17 +35,24 @@ public class Main {
 
 
             Log.it().it(trh);
-
-            //trh.send_old(new Transaction.SBuy("Penuel Katz", "Koloniál Katz", "Flour", 1000, 10));
-            //trh.send_old(new Transaction.SSell("Václav Rolný", "Pole a.s.", "Flour", 200, 12));
-            //trh.send_old(new Transaction.QBuy("Penuel Katz", "Koloniál Katz", "Flour", 24));
+            InventoryDump trhInvDump1 = trh.getInventoryDump();
 
             trh.send(Trans.mkSlowBuy( "Penuel Katz",  "Koloniál Katz", "Flour", 1000, 10));
             trh.send(Trans.mkSlowSell("Václav Rolný", "Pole a.s.",     "Flour", 200, 12));
             trh.send(Trans.mkQuickBuy("Penuel Katz",  "Koloniál Katz", "Flour", 24));
 
+            trh.send(Trans.mkSlowSell("Václav Rolný", "Pole a.s.",     "Flour", 250, 15));
+            trh.send(Trans.mkQuickBuy("Penuel Katz",  "Koloniál Katz", "Work", 100));
+            trh.send(Trans.mkSlowBuy( "Penuel Katz",  "Koloniál Katz", "Flour", 20, 5));
+
+
 
             Log.it().it(trh);
+            InventoryDump trhInvDump2 = trh.getInventoryDump();
+
+            trhInvDump1.porovnej(trhInvDump2) ;
+
+
 
         } catch (Trh.TrhException e) {
             Log.it("ERROR! >>> "+e.getMessage());

@@ -8,7 +8,7 @@ import java.util.*;
  */
 
 public class Trh {
-    private Map<String,Tabule>   tabs;      // komodita -> tabule tý komodity
+    private Map<String,Tabule>      tabs;      // komodita -> tabule tý komodity
     private Map<String,Firm>        firms;     // firmID   -> majetek tý firmy   
     private Map<String,Set<String>> ownership; // agentID  -> mn. firmID co má
                                                // pozdějc bude fikanějc, aby
@@ -43,7 +43,7 @@ public class Trh {
             try {
                 subtractFromFirm(req);
             } catch (TrhException e) {
-                log( "[TRANSACTION FAILED | SUBTRACT EXCEPTION]  " + e.getMessage() );
+                log( "  [TRANSACTION FAILED | SUBTRACT EXCEPTION]  " + e.getMessage() );
             }
 
             try {
@@ -53,12 +53,12 @@ public class Trh {
                 return transResults;
 
             } catch (TrhException e) {
-                log( "[TRANSACTION FAILED | addToTabule EXCEPTION]  " + e.getMessage() );
+                log( "  [TRANSACTION FAILED | addToTabule EXCEPTION]  " + e.getMessage() );
                 return null;
             }
 
         } else {
-            log("[TRANSACTION FAILED | CHECK]  " + checkStatus.getMsg());
+            log("  [TRANSACTION FAILED | CHECK]  " + checkStatus.getMsg());
             return null;
         }
 
@@ -109,9 +109,25 @@ public class Trh {
             sb.append(e.getValue().toString());
         }
 
+        sb.append("\n--- trh-inventory-dump : ---\n");
+        sb.append("  ").append( getInventoryDump() ).append("\n");
 
         sb.append("[[TRH DUMP END]]\n\n");
         return sb.toString();
+    }
+
+    public InventoryDump getInventoryDump() {
+        InventoryDump ret = new InventoryDump();
+
+        for (Map.Entry<String,Firm> e : firms.entrySet()) {
+            ret.add( e.getValue().getInventoryDump() );
+        }
+
+        for (Map.Entry<String,Tabule> e : tabs.entrySet()) {
+            ret.add( e.getValue().getInventoryDump() );
+        }
+
+        return ret;
     }
 
     public void log(Object o){
