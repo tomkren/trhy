@@ -97,7 +97,7 @@ public class InventoryDump {
         }
 
         Log.it("---------------------------");
-        Log.it("Tyto 2 inventory dumps jsou stejný:");
+        Log.it("Hurá, tyto 2 inventory dumps jsou stejný:");
         Log.it(this);
         Log.it(invDump2);
         Log.it("---------------------------");
