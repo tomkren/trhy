@@ -13,19 +13,32 @@ public class Trh {
     private Map<String,Set<String>> ownership; // agentID  -> mn. firmID co má
                                                // pozdějc bude fikanějc, aby
                                                // šli i jiný vztahy než má
+    private List<String> AIDs;
     private int currentTik;   // současnej čas simulace
     private int numTrans;     // aneb nasledující transaction ID
     private List<String> log; // Trhový log.
-
+    private boolean isSilent;
 
     public Trh () {
         tabs      = new HashMap<String, Tabule>();
         firms     = new HashMap<String, Firm>();
         ownership = new HashMap<String, Set<String>>();
 
+        AIDs = new LinkedList<String>();
+
         numTrans   = 0;
         currentTik = 0;
         log = new LinkedList<String>();
+
+        isSilent = false;
+    }
+
+    public void setIsSilent(boolean isSilent) {
+        this.isSilent = isSilent;
+    }
+
+    public Firm getFirm(String fid) {
+        return firms.get(fid);
     }
 
 
@@ -131,14 +144,24 @@ public class Trh {
     }
 
     public void log(Object o){
-        Log.it("<TRH-LOG>        "+o);
+        if (!isSilent) {
+            Log.it("<TRH-LOG>        "+o);
+        }
         log.add(o.toString());
     }
 
     public List<String> getLog() {
         return log;
     }
-    
+
+    public List<String> getAIDs () {
+        return AIDs;
+    }
+
+    public Set<String> getFIDsForAID (String aid) {
+        return ownership.get(aid);
+    }
+
     public void incrementTik () {currentTik ++;}
     public int getTik () {return currentTik;}
     
@@ -177,7 +200,9 @@ public class Trh {
             }
         }
 
-        log("ADD FIRM \'"+firmID+"\'");
+        AIDs.add(agentID);
+
+        log("ADD FIRM \'" + firmID + "\'");
     }
 
 

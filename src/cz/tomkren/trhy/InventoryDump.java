@@ -30,6 +30,16 @@ public class InventoryDump {
         }
     }
 
+    public List<String> getComoNames(boolean includeMoney) {
+        List<String> ret = new ArrayList<String>();
+        for (String cName: dump.keySet()) {
+            if (includeMoney || !cName.equals("$")) {
+                ret.add(cName);
+            }
+        }
+        return ret;
+    }
+
     // todo pokusit se decouplenout
     public InventoryDump (Firm firm) {
         this();
@@ -72,18 +82,12 @@ public class InventoryDump {
     }
 
 
-    public boolean porovnej(Object obj) {
-        if (!(obj instanceof InventoryDump)) {
-            Log.it("nemečuje typ");
-            return false;
-        }
+    public boolean porovnej(InventoryDump invDump2, boolean isSilent) {
 
-        InventoryDump invDump2 = ((InventoryDump) obj);
-        
         Map<String,Double> dump2 = invDump2.dump;
 
         if (dump.size() != dump2.size()) {
-            Log.it("nemečuje size");
+            Log.it("nemečuje size", isSilent);
             return false;
         }
 
@@ -91,16 +95,16 @@ public class InventoryDump {
             double val1 = entry.getValue();
             double val2 = dump2.get(entry.getKey());
             if ( val1 != val2 ) {
-                Log.it("nemečuje množství "+entry.getKey()+" "+val1+" != "+val2);
+                Log.it("nemečuje množství "+entry.getKey()+" "+val1+" != "+val2, isSilent);
                 return false;
             }
         }
 
-        Log.it("---------------------------");
-        Log.it("Hurá, tyto 2 inventory dumps jsou stejný:");
-        Log.it(this);
-        Log.it(invDump2);
-        Log.it("---------------------------");
+        Log.it("---------------------------", isSilent);
+        Log.it("Hurá, tyto 2 inventory dumps jsou stejný:", isSilent);
+        Log.it(this, isSilent);
+        Log.it(invDump2, isSilent);
+        Log.it("---------------------------", isSilent);
 
         return true;
     }

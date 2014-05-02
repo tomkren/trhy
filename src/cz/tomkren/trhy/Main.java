@@ -50,7 +50,9 @@ public class Main {
             Log.it().it(trh);
             InventoryDump trhInvDump2 = trh.getInventoryDump();
 
-            trhInvDump1.porovnej(trhInvDump2) ;
+            trhInvDump1.porovnej(trhInvDump2, false) ;
+
+
 
 
 

@@ -84,7 +84,16 @@ public class Firm {
     public Map<String,Elem> getInventoryMap () {
         return inventory;
     }
-    public double getMoney() { return money; }
+
+    public double getMoney() {
+        return money;
+    }
+
+    public double getComoNum (String comoName) {
+        Elem e = inventory.get(comoName);
+        if (e == null) {return 0;}
+        return e.getNum();
+    }
     
     public static interface Elem {
         public Commodity getCommodity();
