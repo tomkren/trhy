@@ -156,8 +156,8 @@
             </constraints>
             <properties>
               <model>
-                <item value="QUICK"/>
                 <item value="SLOW"/>
+                <item value="QUICK"/>
               </model>
             </properties>
           </component>
@@ -187,7 +187,7 @@
             </constraints>
             <properties>
               <editable value="true"/>
-              <enabled value="false"/>
+              <enabled value="true"/>
               <text value="42"/>
             </properties>
           </component>

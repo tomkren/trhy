@@ -91,12 +91,10 @@ public class TrhView implements ChangeListener {
                 Log.it(  "<"+aid+"> via <"+fid+"> " + (isQuick?"QUICK":"SLOW") +" "+ (isBuy?"BUY":"SELL") +
                         " <"+comoName+"> " + (isBuy?"#$":"#") +": "+ rest + " $: "+(isQuick?"AUTO":price) );
 
-                Trans.Req req;
-
-                if (isBuy) { if (isQuick) { req = Trans.mkQuickBuy(aid, fid, comoName, rest);          }
-                             else         { req = Trans.mkSlowBuy (aid, fid, comoName, rest, price);   }
-                } else     { if (isQuick) { req = Trans.mkQuickSell(aid, fid, comoName, rest);         }
-                             else         { req = Trans.mkSlowSell (aid, fid, comoName, rest, price);  } }
+                Trans.Req req = isBuy ? ( isQuick ? Trans.mkQuickBuy (aid, fid, comoName, rest)
+                                                  : Trans.mkSlowBuy  (aid, fid, comoName, rest, price) )
+                                      : ( isQuick ? Trans.mkQuickSell(aid, fid, comoName, rest)
+                                                  : Trans.mkSlowSell (aid, fid, comoName, rest, price) ) ;
 
                 trh.send(req);
             }
@@ -148,6 +146,12 @@ public class TrhView implements ChangeListener {
     }
 
     public static void main(String[] args) {
+
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            Log.it("Unable to set native look and feel, sorry.");
+        }
 
         Trh trh = new Trh();
         new TrhView(trh);
