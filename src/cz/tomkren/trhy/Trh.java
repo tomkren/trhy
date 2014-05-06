@@ -122,7 +122,7 @@ public class Trh {
         Firm firm = firms.get( res.getFID() ); // todo pokud by byla možnost že se firma odhlásí z trhu, pak by se měla čekovat existence
 
         switch (effectType) {
-            case ADD_COMMODITY : firm.addComodity(res.getComo(), res.getEffectVal() ); break;
+            case ADD_COMMODITY : firm.addCommodity(res.getComo(), res.getEffectVal()); break;
             case ADD_MONEY     : firm.addMoney(                  res.getEffectVal() ); break;
         }
     }
@@ -293,7 +293,7 @@ public class Trh {
             double num = sell.getNum();
             if (num <= 0) {return Trans.ko("SELL Num must be > 0.");}
 
-            if (firm.hasEnoughComodity(comoName,num)) {
+            if (firm.hasEnoughCommodity(comoName, num)) {
                 return Trans.OK;
             } else {
                 return Trans.ko("Firma nemá požadované množství komodity.");
@@ -313,10 +313,10 @@ public class Trh {
             Trans.Sell sell = (Trans.Sell) req;
             Commodity commodity = req.getComo();
 
-            double newNum = firm.addComodity(commodity, -sell.getNum() );
+            double newNum = firm.addCommodity(commodity, -sell.getNum());
 
             if (newNum < 0) {
-                firm.addComodity(commodity, sell.getNum() );
+                firm.addCommodity(commodity, sell.getNum());
                 throw new TrhException("Komodita " + commodity + " ve firme " +
                         req.getFID() + " se dostala pod nulu, operace byla zvracena."+
                         "Bylo by tam mnozstvi " + newNum + ".");

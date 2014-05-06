@@ -122,6 +122,8 @@ public class Trans {
             resEffect = getResEffect();
         }
 
+
+
         public EffectType getEffectType() {return resEffect.getType();}
         public double getEffectVal()      {return resEffect.getVal(); }
 

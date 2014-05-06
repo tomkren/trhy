@@ -12,7 +12,8 @@ public class Main {
             //trh.addFirm("Penuel Katz Fake",Firm.Examples.mkKolonialKatz()); // má vyhodit výjimku že už se tak něco jmenuje
             trh.addFirm("Václav Rolný", Firm.Examples.mkPoleAS());
 
-            Log.it().it(trh);
+            Log.it();
+            Log.it(trh);
             InventoryDump trhInvDump1 = trh.getInventoryDump();
 
             trh.send(Trans.mkSlowBuy( "Penuel Katz",  "Koloniál Katz", "Flour", 1000, 10));
@@ -24,7 +25,8 @@ public class Main {
             trh.send(Trans.mkSlowBuy( "Penuel Katz",  "Koloniál Katz", "Flour", 20, 5));
 
 
-            Log.it().it(trh);
+            Log.it();
+            Log.it(trh);
             InventoryDump trhInvDump2 = trh.getInventoryDump();
             trhInvDump1.porovnej(trhInvDump2, false) ;
 

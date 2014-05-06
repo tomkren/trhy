@@ -9,10 +9,7 @@ public abstract class Commodity {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof Commodity) {
-            return getName().equals( ((Commodity) o).getName() );
-        }
-        return false;
+        return o instanceof Commodity && getName().equals(((Commodity) o).getName());
     }
     
     public static class Basic extends Commodity {

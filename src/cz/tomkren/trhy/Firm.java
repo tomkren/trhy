@@ -12,7 +12,7 @@ public class Firm {
     private String firmID;
     private Map<String,Elem> inventory;
 
-    private double money; // protože se do nich šaha opravdu často,
+    private double money; // protože se do nich šahá opravdu často,
                           // nedáme je pro efektivitu do mapy 
     
     public Firm (String firmID) {
@@ -35,13 +35,13 @@ public class Firm {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("=== "+firmID+" ===\n");
-        sb.append("$ ... "+money+"\n");
+        sb.append("$ ... ").append(money).append("\n");
 
         for (Map.Entry<String, Elem> entry : inventory.entrySet()) {
             String key = entry.getKey();
             Elem value = entry.getValue();
 
-            sb.append(key+ " ... "+value.getNum() + "\n");
+            sb.append(key).append(" ... ").append(value.getNum()).append("\n");
         }
 
         //sb.append("... ").append( getInventoryDump() ).append("\n");
@@ -57,10 +57,9 @@ public class Firm {
         return money >= m; 
     }
     
-    public boolean hasEnoughComodity (String comoName, double num) {
+    public boolean hasEnoughCommodity(String comoName, double num) {
         Elem e = inventory.get(comoName);
-        if (e == null) {return false;}
-        return e.getNum() >= num;
+        return e != null && e.getNum() >= num;
     }
     
     public double addMoney (double delta) {
@@ -68,7 +67,7 @@ public class Firm {
         return money;
     }
     
-    public double addComodity (Commodity c, double delta) {
+    public double addCommodity(Commodity c, double delta) {
         Elem e = inventory.get(c.getName());
         if (e == null) {
             inventory.put(c.getName(), new NumElem(c,delta));
@@ -127,7 +126,7 @@ public class Firm {
 
     public static class Examples {
         public static Firm mkKolonialKatz() {
-            Firm kolonial = new Firm(
+            return new Firm(
                 "Koloniál Katz", //Penuel Katz
                 new Item[]{
                         new Item("$",100000),
@@ -136,11 +135,10 @@ public class Firm {
                         new Item("Pie",100)
                 }
             );
-            return kolonial;
         }
 
         public static Firm mkPoleAS() {
-            Firm poleAS = new Firm(
+            return new Firm(
                 "Pole a.s.",
                 new Item[]{
                         new Item("$",1000),
@@ -148,7 +146,6 @@ public class Firm {
                         new Item("Flour",5000)
                 }
             );
-            return poleAS;
         }
     }
 

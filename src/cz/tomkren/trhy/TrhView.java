@@ -155,6 +155,7 @@ public class TrhView implements ChangeListener {
 
         Trh trh = new Trh();
         new TrhView(trh);
+        trh.setIsSilent(true);
 
         try {
             trh.addFirm("Penuel Katz" , Firm.Examples.mkKolonialKatz());
