@@ -9,7 +9,6 @@ public class TrhView implements ChangeListener {
 
     private Trh    trh;
 
-    private JFrame frame;
     private JLabel tikLabel;
     private JPanel panel;
 
@@ -37,7 +36,7 @@ public class TrhView implements ChangeListener {
         trh = t;
         trh.addChangeListener(this);
 
-        frame = new JFrame("TrhView");
+        JFrame frame = new JFrame("TrhView");
         frame.setContentPane(panel);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.pack();
@@ -86,23 +85,18 @@ public class TrhView implements ChangeListener {
                 boolean isBuy    = "BUY"  .equals(buyOrSellComboBox.getSelectedItem());
                 boolean isQuick  = "QUICK".equals(quickOrSlowComboBox.getSelectedItem());
                 double  rest, price;
-                try {rest  = Double.parseDouble( (String) transRestTextField.getText() );} catch (NumberFormatException ex) {rest = 0;}
-                try {price = Double.parseDouble( (String) priceTextField    .getText() );} catch (NumberFormatException ex) {price= 0;}
+                try {rest  = Double.parseDouble(transRestTextField.getText());} catch (NumberFormatException ex) {rest = 0;}
+                try {price = Double.parseDouble(priceTextField    .getText());} catch (NumberFormatException ex) {price= 0;}
 
                 Log.it(  "<"+aid+"> via <"+fid+"> " + (isQuick?"QUICK":"SLOW") +" "+ (isBuy?"BUY":"SELL") +
                         " <"+comoName+"> " + (isBuy?"#$":"#") +": "+ rest + " $: "+(isQuick?"AUTO":price) );
 
                 Trans.Req req;
 
-                if (isBuy) {
-                    double money = rest;
-                    if (isQuick) { req = Trans.mkQuickBuy(aid, fid, comoName, money);        }
-                    else         { req = Trans.mkSlowBuy (aid, fid, comoName, money, price); }
-                } else { // sell
-                    double num = rest;
-                    if (isQuick) { req = Trans.mkQuickSell(aid, fid, comoName, num);         }
-                    else         { req = Trans.mkSlowSell (aid, fid, comoName, num, price);  }
-                }
+                if (isBuy) { if (isQuick) { req = Trans.mkQuickBuy(aid, fid, comoName, rest);          }
+                             else         { req = Trans.mkSlowBuy (aid, fid, comoName, rest, price);   }
+                } else     { if (isQuick) { req = Trans.mkQuickSell(aid, fid, comoName, rest);         }
+                             else         { req = Trans.mkSlowSell (aid, fid, comoName, rest, price);  } }
 
                 trh.send(req);
             }
