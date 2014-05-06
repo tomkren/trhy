@@ -14,8 +14,8 @@ public class Trh {
                                                // pozdějc bude fikanějc, aby
                                                // šli i jiný vztahy než má
     private List<String> AIDs;
-    private int currentTik;   // současnej čas simulace
-    private int numTrans;     // aneb nasledující transaction ID
+    private int currentTik;   // současný tik simulace (inkrementuje se po jedné akci)
+    private int numTrans;     // aneb následující transaction ID
     private List<String> log; // Trhový log.
     private boolean isSilent;
 
