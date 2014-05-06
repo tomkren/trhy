@@ -12,35 +12,13 @@ public class TrhTest {
     @org.junit.Before
     public void setUp() throws Exception {
 
-        Firm kolonial = new Firm(
-                "Koloniál Katz", //Penuel Katz
-                new Item[]{
-                        new Item("$",100000),
-                        new Item("Work",5),
-                        new Item("Flour",5000),
-                        new Item("Pie",100)
-                });
-
-        Firm poleAS = new Firm(
-                "Pole a.s.",
-                new Item[]{
-                        new Item("$",1000),
-                        new Item("Work",1000),
-                        new Item("Flour",5000)
-                });
-
-
-
         trh = new Trh();
         trhTester = new TrhTester(trh);
 
         try {
-
-            trh.addFirm("Penuel Katz", kolonial);
-            //trh.addFirm("Penuel Katz Fake",kolonial); // má vyhodit výjimku že už se tak něco jmenuje
-            trh.addFirm("Václav Rolný", poleAS);
-
-
+            trh.addFirm("Penuel Katz" , Firm.Examples.mkKolonialKatz());
+            //trh.addFirm("Penuel Katz Fake",Firm.Examples.mkKolonialKatz()); // má vyhodit výjimku že už se tak něco jmenuje
+            trh.addFirm("Václav Rolný", Firm.Examples.mkPoleAS());
         } catch (Trh.TrhException e) {
             Log.it("ERROR! >>> "+e.getMessage());
         }
@@ -48,7 +26,7 @@ public class TrhTest {
 
     @org.junit.Test
     public void testGetTik() throws Exception {
-        assertEquals(0, trh.getTik());
+        assertEquals(2, trh.getTik());
     }
 
     @org.junit.Test
