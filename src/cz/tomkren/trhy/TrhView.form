@@ -110,16 +110,6 @@
           </component>
         </children>
       </grid>
-      <component id="a820b" class="javax.swing.JTextArea" binding="logTextArea">
-        <constraints>
-          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
-            <preferred-size width="150" height="500"/>
-          </grid>
-        </constraints>
-        <properties>
-          <text value="Log will be here..."/>
-        </properties>
-      </component>
       <hspacer id="d39b0">
         <constraints>
           <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
@@ -269,6 +259,30 @@
         <constraints>
           <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
             <preferred-size width="-1" height="10"/>
+          </grid>
+        </constraints>
+      </vspacer>
+      <scrollpane id="7d4f6">
+        <constraints>
+          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false">
+            <preferred-size width="133" height="223"/>
+          </grid>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="a820b" class="javax.swing.JTextArea" binding="logTextArea">
+            <constraints/>
+            <properties>
+              <text value="Log will be here..."/>
+            </properties>
+          </component>
+        </children>
+      </scrollpane>
+      <vspacer id="e8a69">
+        <constraints>
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
+            <minimum-size width="-1" height="500"/>
           </grid>
         </constraints>
       </vspacer>
