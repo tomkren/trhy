@@ -1,8 +1,6 @@
 package cz.tomkren.trhy;
 
-/**
- * Created by sekol on 29.3.2014.
- */
+
 public class Log {
 
     private static Log log = new Log();

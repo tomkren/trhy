@@ -1,8 +1,7 @@
 package cz.tomkren.observer;
 
-import cz.tomkren.trhy.Log;
-
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ChangeInformer implements ChangeInformerService {
     private List<ChangeListener> listeners;

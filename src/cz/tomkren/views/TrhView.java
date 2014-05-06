@@ -40,7 +40,7 @@ public class TrhView implements ChangeListener {
 
     public TrhView(Trh t) {
         trh = t;
-        Utils.initFrame("TrhView", panel, trh.getChangeInformer(), this);
+        Utils.mkFrameAndRegister("TrhView", panel, trh.getChangeInformer(), this);
         draw();
 
         showFirmButton.addActionListener(new ActionListener() {

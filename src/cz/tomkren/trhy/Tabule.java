@@ -87,6 +87,18 @@ public class Tabule {
         return commodity.getName();
     }
 
+    //todo ZJISTIT ZDA FACHA SPRAVNE, zatim netestovano
+
+    public PriceInfo getPriceInfo() {
+
+        double high = Collections.max(demand, new MaxRowComparator()).getPrice();
+        double low  = Collections.min(supply, new MaxRowComparator()).getPrice();
+
+        return new PriceInfo(high, supply.peek().getPrice(), demand.peek().getPrice(), low);
+    }
+
+
+
     public List<Trans.Res> add (Trans.Req req, int transID, int currentTik) {
         List<Trans.Res> ret = null;
 

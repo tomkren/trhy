@@ -8,7 +8,7 @@ import java.awt.event.*;
 
 public class Utils {
 
-    public static JFrame initFrame(String name, Container container, ChangeInformerService informer, ChangeListener listener) {
+    public static JFrame mkFrameAndRegister(String name, Container container, ChangeInformerService informer, ChangeListener listener) {
 
         informer.addListener(listener);
 
