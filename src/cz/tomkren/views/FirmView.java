@@ -1,7 +1,7 @@
 package cz.tomkren.views;
 
 import cz.tomkren.observer.ChangeListener;
-import cz.tomkren.trhy.Firm;
+import cz.tomkren.trhy.*;
 
 import javax.swing.*;
 
@@ -16,14 +16,7 @@ public class FirmView implements ChangeListener {
 
     public FirmView(Firm f) {
         firm = f;
-        firm.getChangeInformer().addListener(this);
-
-        JFrame frame = new JFrame(firm.getFirmID());
-        frame.setContentPane(panel);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.pack();
-        frame.setVisible(true);
-
+        Utils.initFrame(firm.getFirmID(), panel, firm.getChangeInformer(), this);
         draw();
     }
 

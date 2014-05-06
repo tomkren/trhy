@@ -1,5 +1,7 @@
 package cz.tomkren.observer;
 
+import cz.tomkren.trhy.Log;
+
 import java.util.*;
 
 public class ChangeInformer implements ChangeInformerService {

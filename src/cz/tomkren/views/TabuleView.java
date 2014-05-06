@@ -15,14 +15,7 @@ public class TabuleView implements ChangeListener {
 
     public TabuleView(Tabule t) {
         tabule = t;
-        tabule.getChangeInformer().addListener(this);
-
-        frame = new JFrame( tabule.getComoName() + " market table" );
-        frame.setContentPane(panel);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.pack();
-        frame.setVisible(true);
-
+        Utils.initFrame(tabule.getComoName() + " market table", panel, tabule.getChangeInformer(), this);
         draw();
     }
 

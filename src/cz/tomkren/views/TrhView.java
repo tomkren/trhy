@@ -40,13 +40,8 @@ public class TrhView implements ChangeListener {
 
     public TrhView(Trh t) {
         trh = t;
-        trh.getChangeInformer().addListener(this);
-
-        JFrame frame = new JFrame("TrhView");
-        frame.setContentPane(panel);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.pack();
-        frame.setVisible(true);
+        Utils.initFrame("TrhView", panel, trh.getChangeInformer(), this);
+        draw();
 
         showFirmButton.addActionListener(new ActionListener() {
             @Override
