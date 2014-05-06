@@ -1,4 +1,4 @@
-package cz.tomkren.trhy;
+package cz.tomkren.observer;
 
 /**
  * Created by sekol on 5.5.2014.

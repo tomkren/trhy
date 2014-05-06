@@ -1,5 +1,10 @@
 Nejdřív asi dodělat TrhTester, abych si byl jistější v kranflekách, že to fakt fachá jak by mělo.
 
+- DRY: udělat ChangeInformerBehavior aby se všude neopakovali ty tři metody, DRáJ voe!
+
+- po uzavření okna se musí view odhlásit changeListenerování
+
+
 - TrhView - okýnka na pohodlné pozorování trhu
    - předělat všcky viewes aby dědili od společnýho aby DRY
    - udělat historii (např pro firmy, tabule ... dokonce celej trh?)

@@ -1,5 +1,8 @@
 package cz.tomkren.trhy;
 
+import cz.tomkren.observer.ChangeInformer;
+import cz.tomkren.observer.ChangeInformerService;
+
 import java.util.*;
 
 /**
@@ -14,6 +17,8 @@ public class Tabule {
 
     private PriorityQueue<Row> supply;
     private PriorityQueue<Row> demand;
+
+    private ChangeInformer changeInformer;
 
     public static enum RowType {SUPPLY, DEMAND}
 
@@ -71,6 +76,11 @@ public class Tabule {
         int initialCapacity = 11; //11 je prej default
         supply = new PriorityQueue<Row>(initialCapacity, new MinRowComparator()); 
         demand = new PriorityQueue<Row>(initialCapacity, new MaxRowComparator());
+        changeInformer = new ChangeInformer();
+    }
+
+    public ChangeInformerService getChangeInformer() {
+        return changeInformer;
     }
 
     public String getComoName() {
@@ -78,9 +88,13 @@ public class Tabule {
     }
 
     public List<Trans.Res> add (Trans.Req req, int transID, int currentTik) {
-        if (req instanceof Trans.Buy) { return  addBuy(new  BuyOpts((Trans.Buy) req, transID, currentTik)); }
-        if (req instanceof Trans.Sell){ return addSell(new SellOpts((Trans.Sell)req, transID, currentTik)); }
-        return null;
+        List<Trans.Res> ret = null;
+
+        if (req instanceof Trans.Buy) { ret =  addBuy(new  BuyOpts((Trans.Buy) req, transID, currentTik)); }
+        if (req instanceof Trans.Sell){ ret = addSell(new SellOpts((Trans.Sell)req, transID, currentTik)); }
+
+        changeInformer.informListeners();
+        return ret;
     }
 
     private List<Trans.Res> addBuy (BuyOpts buyOpts) {

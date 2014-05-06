@@ -1,13 +1,14 @@
-package cz.tomkren.trhy;
+package cz.tomkren.views;
+
+import cz.tomkren.observer.ChangeListener;
+import cz.tomkren.trhy.Firm;
 
 import javax.swing.*;
 
 
-public class FirmView {
+public class FirmView implements ChangeListener {
 
     private Firm firm;
-
-    private JFrame frame;
 
     private JPanel panel;
     private JLabel fidLabel;
@@ -15,8 +16,9 @@ public class FirmView {
 
     public FirmView(Firm f) {
         firm = f;
+        firm.getChangeInformer().addListener(this);
 
-        frame = new JFrame(firm.getFirmID());
+        JFrame frame = new JFrame(firm.getFirmID());
         frame.setContentPane(panel);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.pack();
@@ -28,5 +30,10 @@ public class FirmView {
     private void draw () {
         fidLabel.setText(firm.getFirmID());
         textArea.setText(firm.toString());
+    }
+
+    @Override
+    public void onChange() {
+        draw();
     }
 }

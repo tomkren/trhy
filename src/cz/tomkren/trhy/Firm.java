@@ -1,7 +1,9 @@
 package cz.tomkren.trhy;
 
-import java.util.HashMap;
-import java.util.Map;
+import cz.tomkren.observer.ChangeInformer;
+import cz.tomkren.observer.ChangeInformerService;
+
+import java.util.*;
 
 /**
  *
@@ -14,11 +16,14 @@ public class Firm {
 
     private double money; // protože se do nich šahá opravdu často,
                           // nedáme je pro efektivitu do mapy 
-    
+
+    private ChangeInformer changeInformer;
+
     public Firm (String firmID) {
         this.firmID = firmID;
         inventory = new HashMap<String, Elem>();
         money = 0;
+        changeInformer = new ChangeInformer();
     }
 
     public Firm (String firmID, Item[] items) {
@@ -30,6 +35,10 @@ public class Firm {
                 inventory.put(it.getCommodity().getName(),new NumElem(it.getCommodity(),it.getNum()));
             }
         }
+    }
+
+    public ChangeInformerService getChangeInformer() {
+        return changeInformer;
     }
 
     @Override
@@ -64,16 +73,21 @@ public class Firm {
     
     public double addMoney (double delta) {
         money += delta;
+        changeInformer.informListeners();
         return money;
     }
     
-    public double addCommodity(Commodity c, double delta) {
+    public double addCommodity (Commodity c, double delta) {
+        double ret; // kolik je komodity po přidání
         Elem e = inventory.get(c.getName());
         if (e == null) {
             inventory.put(c.getName(), new NumElem(c,delta));
-            return delta;
+            ret = delta;
+        } else {
+            ret = e.addNum(delta);
         }
-        return e.addNum(delta);
+        changeInformer.informListeners();
+        return ret;
     }
     
     public String getFirmID () {

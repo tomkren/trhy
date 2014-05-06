@@ -1,11 +1,11 @@
-package cz.tomkren.trhy;
+package cz.tomkren.views;
+
+import cz.tomkren.observer.ChangeListener;
+import cz.tomkren.trhy.Tabule;
 
 import javax.swing.*;
 
-/**
- * Created by sekol on 6.5.2014.
- */
-public class TabuleView {
+public class TabuleView implements ChangeListener {
     private Tabule tabule;
     private JFrame frame;
 
@@ -15,6 +15,7 @@ public class TabuleView {
 
     public TabuleView(Tabule t) {
         tabule = t;
+        tabule.getChangeInformer().addListener(this);
 
         frame = new JFrame( tabule.getComoName() + " market table" );
         frame.setContentPane(panel);
@@ -28,5 +29,10 @@ public class TabuleView {
     private void draw () {
         comoNameLabel.setText(tabule.getComoName());
         textArea.setText(tabule.toString());
+    }
+
+    @Override
+    public void onChange() {
+        draw();
     }
 }

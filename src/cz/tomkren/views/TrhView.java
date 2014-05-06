@@ -1,4 +1,10 @@
-package cz.tomkren.trhy;
+package cz.tomkren.views;
+
+import cz.tomkren.observer.ChangeListener;
+import cz.tomkren.trhy.Firm;
+import cz.tomkren.trhy.Log;
+import cz.tomkren.trhy.Trans;
+import cz.tomkren.trhy.Trh;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -7,7 +13,7 @@ import java.awt.event.ActionListener;
 
 public class TrhView implements ChangeListener {
 
-    private Trh    trh;
+    private Trh trh;
 
     private JLabel tikLabel;
     private JPanel panel;
@@ -34,7 +40,7 @@ public class TrhView implements ChangeListener {
 
     public TrhView(Trh t) {
         trh = t;
-        trh.addChangeListener(this);
+        trh.getChangeInformer().addListener(this);
 
         JFrame frame = new JFrame("TrhView");
         frame.setContentPane(panel);
@@ -88,8 +94,8 @@ public class TrhView implements ChangeListener {
                 try {rest  = Double.parseDouble(transRestTextField.getText());} catch (NumberFormatException ex) {rest = 0;}
                 try {price = Double.parseDouble(priceTextField    .getText());} catch (NumberFormatException ex) {price= 0;}
 
-                Log.it(  "<"+aid+"> via <"+fid+"> " + (isQuick?"QUICK":"SLOW") +" "+ (isBuy?"BUY":"SELL") +
-                        " <"+comoName+"> " + (isBuy?"#$":"#") +": "+ rest + " $: "+(isQuick?"AUTO":price) );
+                Log.it("<" + aid + "> via <" + fid + "> " + (isQuick ? "QUICK" : "SLOW") + " " + (isBuy ? "BUY" : "SELL") +
+                        " <" + comoName + "> " + (isBuy ? "#$" : "#") + ": " + rest + " $: " + (isQuick ? "AUTO" : price));
 
                 Trans.Req req = isBuy ? ( isQuick ? Trans.mkQuickBuy (aid, fid, comoName, rest)
                                                   : Trans.mkSlowBuy  (aid, fid, comoName, rest, price) )

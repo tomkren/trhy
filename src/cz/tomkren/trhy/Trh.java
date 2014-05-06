@@ -1,5 +1,8 @@
 package cz.tomkren.trhy;
 
+import cz.tomkren.observer.ChangeInformer;
+import cz.tomkren.observer.ChangeInformerService;
+
 import java.util.*;
 
 /**
@@ -19,7 +22,7 @@ public class Trh {
     private List<String> log; // Trhový log.
     private boolean isSilent;
 
-    private List<ChangeListener> changeListeners;
+    private ChangeInformer changeInformer;
 
     public Trh () {
         tabs      = new HashMap<String, Tabule>();
@@ -34,17 +37,11 @@ public class Trh {
 
         isSilent = false;
 
-        changeListeners = new LinkedList<ChangeListener>();
+        changeInformer = new ChangeInformer();
     }
 
-    public void addChangeListener (ChangeListener listener) {
-        changeListeners.add(listener);
-    }
-
-    private void informChangeListeners () {
-        for (ChangeListener lister : changeListeners) {
-            lister.onChange();
-        }
+    public ChangeInformerService getChangeInformer() {
+        return changeInformer;
     }
 
     public void setIsSilent(boolean isSilent) {
@@ -102,7 +99,7 @@ public class Trh {
 
     private void finalizeAction() {
         incrementTik();
-        informChangeListeners();
+        changeInformer.informListeners();
     }
 
 
