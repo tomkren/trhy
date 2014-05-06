@@ -21,7 +21,6 @@ public class TrhTester {
 
         Log.it("Sending random transaction..");
 
-        boolean isSilent = false;
         InventoryDump beforeDump = trh.getInventoryDump();
 
         // select random agent id
@@ -84,7 +83,7 @@ public class TrhTester {
         trh.send(req);
 
         InventoryDump afterDump = trh.getInventoryDump();
-        return beforeDump.porovnej(afterDump,isSilent);
+        return beforeDump.porovnej(afterDump, false);
     }
     
     private double randDouble (double from, double to) {
