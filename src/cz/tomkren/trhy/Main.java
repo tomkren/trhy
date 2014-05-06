@@ -5,34 +5,12 @@ public class Main {
     public static void main(String[] args) {
         Log.it("MARKETS!\n");
 
-        Firm kolonial = new Firm(
-            "Koloniál Katz", //Penuel Katz
-            new Item[]{
-                new Item("$",100000),
-                new Item("Work",5),
-                new Item("Flour",5000),
-                new Item("Pie",100)
-        });
-
-        Firm poleAS = new Firm(
-            "Pole a.s.",
-            new Item[]{
-                new Item("$",1000),
-                new Item("Work",1000),
-                new Item("Flour",5000)
-        });
-
-
-
         Trh trh = new Trh();
 
         try {
-
-            trh.addFirm("Penuel Katz", kolonial);
-            //trh.addFirm("Penuel Katz Fake",kolonial); // má vyhodit výjimku že už se tak něco jmenuje
-            trh.addFirm("Václav Rolný", poleAS);
-
-
+            trh.addFirm("Penuel Katz", Firm.Examples.mkKolonialKatz());
+            //trh.addFirm("Penuel Katz Fake",Firm.Examples.mkKolonialKatz()); // má vyhodit výjimku že už se tak něco jmenuje
+            trh.addFirm("Václav Rolný", Firm.Examples.mkPoleAS());
 
             Log.it().it(trh);
             InventoryDump trhInvDump1 = trh.getInventoryDump();
@@ -46,14 +24,9 @@ public class Main {
             trh.send(Trans.mkSlowBuy( "Penuel Katz",  "Koloniál Katz", "Flour", 20, 5));
 
 
-
             Log.it().it(trh);
             InventoryDump trhInvDump2 = trh.getInventoryDump();
-
             trhInvDump1.porovnej(trhInvDump2, false) ;
-
-
-
 
 
         } catch (Trh.TrhException e) {
@@ -61,6 +34,8 @@ public class Main {
         }
 
 
+        //Log.it( InventoryDump.isAlmostTheSame(2,2.0000000001) );
+        //Log.it( InventoryDump.isAlmostTheSame(2,2.000000001) );
 
 
 

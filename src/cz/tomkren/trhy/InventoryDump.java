@@ -82,6 +82,11 @@ public class InventoryDump {
     }
 
 
+    public static final double EPSILON = 0.000000001;    // todo ještě líp udělat pomocí relativního epsilon..
+    public static boolean isAlmostTheSame(double a, double b) {
+        return a == b || Math.abs(a-b) < EPSILON;
+    }
+
     public boolean porovnej(InventoryDump invDump2, boolean isSilent) {
 
         Map<String,Double> dump2 = invDump2.dump;
@@ -94,7 +99,7 @@ public class InventoryDump {
         for (Map.Entry<String,Double> entry: dump.entrySet()) {
             double val1 = entry.getValue();
             double val2 = dump2.get(entry.getKey());
-            if ( val1 != val2 ) {
+            if ( !isAlmostTheSame(val1, val2) ) {
                 Log.it("nemečuje množství "+entry.getKey()+" "+val1+" != "+val2, isSilent);
                 return false;
             }

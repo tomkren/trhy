@@ -198,7 +198,7 @@
             <properties>
               <editable value="true"/>
               <enabled value="false"/>
-              <text value=""/>
+              <text value="42"/>
             </properties>
           </component>
           <component id="918bb" class="javax.swing.JTextField" binding="transRestTextField">
@@ -208,7 +208,7 @@
               </grid>
             </constraints>
             <properties>
-              <text value=""/>
+              <text value="23"/>
             </properties>
           </component>
           <component id="39ddd" class="javax.swing.JComboBox" binding="transFidComboBox">

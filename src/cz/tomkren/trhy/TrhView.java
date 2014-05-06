@@ -13,8 +13,8 @@ public class TrhView implements ChangeListener {
     private JLabel tikLabel;
     private JPanel panel;
 
-    private JComboBox firmComboBox;
-    private JComboBox comoComboBox;
+    private JComboBox<String> firmComboBox;
+    private JComboBox<String> comoComboBox;
     private JButton   showFirmButton;
     private JButton   showTabuleButton;
     private JButton   showAllFirmsButton;
@@ -22,15 +22,15 @@ public class TrhView implements ChangeListener {
 
     private JTextArea logTextArea;
 
-    private JComboBox  transFidComboBox;
+    private JComboBox<String> transFidComboBox;
     private JComboBox  buyOrSellComboBox;
     private JComboBox  quickOrSlowComboBox;
-    private JComboBox  transComoComboBox;
+    private JComboBox<String> transComoComboBox;
     private JTextField priceTextField;
     private JTextField transRestTextField;
     private JButton    sendButton;
     private JLabel transRestLabel;
-    private JComboBox transAidComboBox;
+    private JComboBox<String> transAidComboBox;
 
 
     public TrhView(Trh t) {
@@ -125,19 +125,15 @@ public class TrhView implements ChangeListener {
         });
     }
 
-
-
-
     public void draw() {
 
         tikLabel.setText( Integer.toString(trh.getTik()) );
 
-
-        ComboBoxModel aidsModel   = new DefaultComboBoxModel( trh.getAIDsArray() );
-        ComboBoxModel fidsModel1  = new DefaultComboBoxModel( trh.getFIDsArray() );
-        ComboBoxModel fidsModel2  = new DefaultComboBoxModel( trh.getFIDsArray() );
-        ComboBoxModel comosModel1 = new DefaultComboBoxModel( trh.getTabsArray() );
-        ComboBoxModel comosModel2 = new DefaultComboBoxModel( trh.getTabsArray() );
+        ComboBoxModel<String> aidsModel   = new DefaultComboBoxModel<String>( trh.getAIDsArray() );
+        ComboBoxModel<String> fidsModel1  = new DefaultComboBoxModel<String>( trh.getFIDsArray() );
+        ComboBoxModel<String> fidsModel2  = new DefaultComboBoxModel<String>( trh.getFIDsArray() );
+        ComboBoxModel<String> comosModel1 = new DefaultComboBoxModel<String>( trh.getTabsArray() );
+        ComboBoxModel<String> comosModel2 = new DefaultComboBoxModel<String>( trh.getTabsArray() );
 
         transAidComboBox .setModel(aidsModel);
         transFidComboBox .setModel(fidsModel1);
@@ -157,49 +153,19 @@ public class TrhView implements ChangeListener {
         draw();
     }
 
-    public void testUpdate() {
-        int i = Integer.parseInt(tikLabel.getText());
-        tikLabel.setText(Integer.toString(i + 1));
-    }
-
     public static void main(String[] args) {
 
-        Firm kolonial = new Firm(
-                "Koloniál Katz", //Penuel Katz
-                new Item[]{
-                        new Item("$",100000),
-                        new Item("Work",5),
-                        new Item("Flour",5000),
-                        new Item("Pie",100)
-                });
-
-        Firm poleAS = new Firm(
-                "Pole a.s.",
-                new Item[]{
-                        new Item("$",1000),
-                        new Item("Work",1000),
-                        new Item("Flour",5000)
-                });
-
         Trh trh = new Trh();
-
         new TrhView(trh);
 
         try {
-
-            trh.addFirm("Penuel Katz", kolonial);
-            trh.addFirm("Václav Rolný", poleAS);
-
-
+            trh.addFirm("Penuel Katz" , Firm.Examples.mkKolonialKatz());
+            trh.addFirm("Václav Rolný", Firm.Examples.mkPoleAS());
         } catch (Trh.TrhException e) {
             Log.it("ERROR! >>> "+e.getMessage());
         }
 
-        //for (int i = 0; i < 10000000; i++) {
-        //    tv.testUpdate();
-        //}
     }
-
 
 
 }

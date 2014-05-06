@@ -125,4 +125,31 @@ public class Firm {
         } 
     }
 
+    public static class Examples {
+        public static Firm mkKolonialKatz() {
+            Firm kolonial = new Firm(
+                "Koloniál Katz", //Penuel Katz
+                new Item[]{
+                        new Item("$",100000),
+                        new Item("Work",5),
+                        new Item("Flour",5000),
+                        new Item("Pie",100)
+                }
+            );
+            return kolonial;
+        }
+
+        public static Firm mkPoleAS() {
+            Firm poleAS = new Firm(
+                "Pole a.s.",
+                new Item[]{
+                        new Item("$",1000),
+                        new Item("Work",1000),
+                        new Item("Flour",5000)
+                }
+            );
+            return poleAS;
+        }
+    }
+
 }
