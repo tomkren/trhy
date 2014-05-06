@@ -2,31 +2,40 @@ package cz.tomkren.trhy;
 
 
 public class PriceInfo {
-    private double high;
-    private double bestSupply;
-    private double bestDemand;
-    private double low;
+    private Double maxSupply;
+    private Double bestSupply;
+    private Double bestDemand;
+    private Double minDemand;
 
-    public PriceInfo(double high, double bestSupply, double bestDemand, double low) {
-        this.high = high;
+    public PriceInfo(Double maxSupply, Double bestSupply, Double bestDemand, Double minDemand) {
+        this.maxSupply = maxSupply;
         this.bestSupply = bestSupply;
         this.bestDemand = bestDemand;
-        this.low = low;
+        this.minDemand = minDemand;
     }
 
-    public double getHigh() {
-        return high;
+    public Double getMaxSupply () {
+        return maxSupply;
     }
-
-    public double getBestSupply() {
+    public Double getBestSupply() {
         return bestSupply;
     }
-
-    public double getBestDemand() {
+    public Double getBestDemand() {
         return bestDemand;
     }
+    public Double getMinDemand () {
+        return minDemand;
+    }
 
-    public double getLow() {
-        return low;
+    public Double getHigh() {
+        return maxSupply != null ? maxSupply : bestDemand;
+    }
+    public Double getLow () {
+        return minDemand != null ? minDemand : bestSupply;
+    }
+
+    @Override
+    public String toString() {
+        return "[" + maxSupply +", " + bestSupply +", " + bestDemand +", " + minDemand +" ]";
     }
 }

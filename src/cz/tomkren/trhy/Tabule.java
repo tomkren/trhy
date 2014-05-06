@@ -87,14 +87,21 @@ public class Tabule {
         return commodity.getName();
     }
 
-    //todo ZJISTIT ZDA FACHA SPRAVNE, zatim netestovano
 
     public PriceInfo getPriceInfo() {
+        Double maxSupply = null, bestSupply = null, bestDemand = null, minDemand = null;
 
-        double high = Collections.max(demand, new MaxRowComparator()).getPrice();
-        double low  = Collections.min(supply, new MaxRowComparator()).getPrice();
+        if (!supply.isEmpty()) {
+            maxSupply  = Collections.max(supply, new MinRowComparator()).getPrice();
+            bestSupply = supply.peek().getPrice();
+        }
 
-        return new PriceInfo(high, supply.peek().getPrice(), demand.peek().getPrice(), low);
+        if (!demand.isEmpty()) {
+            bestDemand = demand.peek().getPrice();
+            minDemand  = Collections.min(demand, new MinRowComparator()).getPrice();
+        }
+
+        return new PriceInfo(maxSupply, bestSupply, bestDemand, minDemand);
     }
 
 

@@ -7,11 +7,11 @@ import javax.swing.*;
 
 public class TabuleView implements ChangeListener {
     private Tabule tabule;
-    private JFrame frame;
 
     private JTextArea textArea;
     private JPanel panel;
     private JLabel comoNameLabel;
+    private JLabel priceInfoLabel;
 
     public TabuleView(Tabule t) {
         tabule = t;
@@ -21,6 +21,8 @@ public class TabuleView implements ChangeListener {
 
     private void draw () {
         comoNameLabel.setText(tabule.getComoName());
+        priceInfoLabel.setText(tabule.getPriceInfo().toString());
+
         textArea.setText(tabule.toString());
     }
 
