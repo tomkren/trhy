@@ -19,6 +19,8 @@ public class Trh {
     private List<String> log; // Trhový log.
     private boolean isSilent;
 
+    private List<ChangeListener> changeListeners;
+
     public Trh () {
         tabs      = new HashMap<String, Tabule>();
         firms     = new HashMap<String, Firm>();
@@ -31,6 +33,18 @@ public class Trh {
         log = new LinkedList<String>();
 
         isSilent = false;
+
+        changeListeners = new LinkedList<ChangeListener>();
+    }
+
+    public void addChangeListener (ChangeListener listener) {
+        changeListeners.add(listener);
+    }
+
+    private void informChangeListeners () {
+        for (ChangeListener lister : changeListeners) {
+            lister.onChange();
+        }
     }
 
     public void setIsSilent(boolean isSilent) {
@@ -39,6 +53,10 @@ public class Trh {
 
     public Firm getFirm(String fid) {
         return firms.get(fid);
+    }
+
+    public Tabule getTabule(String comoName) {
+        return tabs.get(comoName);
     }
 
 
@@ -57,21 +75,26 @@ public class Trh {
                 subtractFromFirm(req);
             } catch (TrhException e) {
                 log( "  [TRANSACTION FAILED | SUBTRACT EXCEPTION]  " + e.getMessage() );
+                informChangeListeners();
+                return null;
             }
 
             try {
 
                 List<Trans.Res> transResults = addToTabule(req);
                 performResultsUpdate(transResults);
+                informChangeListeners();
                 return transResults;
 
             } catch (TrhException e) {
                 log( "  [TRANSACTION FAILED | addToTabule EXCEPTION]  " + e.getMessage() );
+                informChangeListeners();
                 return null;
             }
 
         } else {
             log("  [TRANSACTION FAILED | CHECK]  " + checkStatus.getMsg());
+            informChangeListeners();
             return null;
         }
 
@@ -143,7 +166,7 @@ public class Trh {
         return ret;
     }
 
-    public void log(Object o){
+    private void log(Object o){
         if (!isSilent) {
             Log.it("<TRH-LOG>        "+o);
         }
@@ -162,14 +185,22 @@ public class Trh {
         return ownership.get(aid);
     }
 
-    public void incrementTik () {currentTik ++;}
+    public String[] getFIDsArray() {
+        return firms.keySet().toArray( new String[firms.size()]  );
+    }
+
+    public String[] getTabsArray() {
+        return tabs.keySet().toArray( new String[firms.size()]  );
+    }
+
+    private void incrementTik () {currentTik ++;}
     public int getTik () {return currentTik;}
     
     private int nextTransID () {
         return numTrans ++;
     }
     
-    public void addTabule (Commodity c) {
+    private void addTabule (Commodity c) {
         tabs.put(c.getName(), new Tabule(c));
     }
     
@@ -203,6 +234,8 @@ public class Trh {
         AIDs.add(agentID);
 
         log("ADD FIRM \'" + firmID + "\'");
+
+        informChangeListeners();
     }
 
 
@@ -212,7 +245,7 @@ public class Trh {
         return hisFirms != null && hisFirms.contains(firmID);
     }
 
-    public Trans.CheckStatus checkTransReq (Trans.Req req) {
+    private Trans.CheckStatus checkTransReq (Trans.Req req) {
 
         if (!isOwner(req.getAID(), req.getFID())) {
             return Trans.ko("Agent není majitelem firmy.");

@@ -73,6 +73,10 @@ public class Tabule {
         demand = new PriorityQueue<Row>(initialCapacity, new MaxRowComparator());
     }
 
+    public String getComoName() {
+        return commodity.getName();
+    }
+
     public List<Trans.Res> add (Trans.Req req, int transID, int currentTik) {
         if (req instanceof Trans.Buy) { return  addBuy(new  BuyOpts((Trans.Buy) req, transID, currentTik)); }
         if (req instanceof Trans.Sell){ return addSell(new SellOpts((Trans.Sell)req, transID, currentTik)); }
