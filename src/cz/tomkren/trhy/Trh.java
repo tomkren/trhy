@@ -75,7 +75,7 @@ public class Trh {
                 subtractFromFirm(req);
             } catch (TrhException e) {
                 log( "  [TRANSACTION FAILED | SUBTRACT EXCEPTION]  " + e.getMessage() );
-                informChangeListeners();
+                finalizeAction();
                 return null;
             }
 
@@ -83,22 +83,28 @@ public class Trh {
 
                 List<Trans.Res> transResults = addToTabule(req);
                 performResultsUpdate(transResults);
-                informChangeListeners();
+                finalizeAction();
                 return transResults;
 
             } catch (TrhException e) {
                 log( "  [TRANSACTION FAILED | addToTabule EXCEPTION]  " + e.getMessage() );
-                informChangeListeners();
+                finalizeAction();
                 return null;
             }
 
         } else {
             log("  [TRANSACTION FAILED | CHECK]  " + checkStatus.getMsg());
-            informChangeListeners();
+            finalizeAction();
             return null;
         }
 
     }
+
+    private void finalizeAction() {
+        incrementTik();
+        informChangeListeners();
+    }
+
 
     private void performResultsUpdate (List<Trans.Res> rs) {
         for (Trans.Res r : rs) {
@@ -189,6 +195,10 @@ public class Trh {
         return firms.keySet().toArray( new String[firms.size()]  );
     }
 
+    public String[] getAIDsArray() {
+        return AIDs.toArray(new String[AIDs.size()]);
+    }
+
     public String[] getTabsArray() {
         return tabs.keySet().toArray( new String[firms.size()]  );
     }
@@ -204,7 +214,7 @@ public class Trh {
         tabs.put(c.getName(), new Tabule(c));
     }
     
-    public void addAgentsFirm (String agentID, Firm hisFirm) throws TrhException {
+    public void addFirm(String agentID, Firm hisFirm) throws TrhException {
         
 
         String firmID = hisFirm.getFirmID();
@@ -235,7 +245,7 @@ public class Trh {
 
         log("ADD FIRM \'" + firmID + "\'");
 
-        informChangeListeners();
+        finalizeAction();
     }
 
 

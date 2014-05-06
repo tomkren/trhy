@@ -28,9 +28,9 @@ public class Main {
 
         try {
 
-            trh.addAgentsFirm("Penuel Katz",kolonial);
-            //trh.addAgentsFirm("Penuel Katz Fake",kolonial); // má vyhodit výjimku že už se tak něco jmenuje
-            trh.addAgentsFirm("Václav Rolný",poleAS);
+            trh.addFirm("Penuel Katz", kolonial);
+            //trh.addFirm("Penuel Katz Fake",kolonial); // má vyhodit výjimku že už se tak něco jmenuje
+            trh.addFirm("Václav Rolný", poleAS);
 
 
 

@@ -29,6 +29,8 @@ public class TrhView implements ChangeListener {
     private JTextField priceTextField;
     private JTextField transRestTextField;
     private JButton    sendButton;
+    private JLabel transRestLabel;
+    private JComboBox transAidComboBox;
 
 
     public TrhView(Trh t) {
@@ -74,7 +76,55 @@ public class TrhView implements ChangeListener {
                 }
             }
         });
+
+        sendButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String  aid      = (String) transAidComboBox.getSelectedItem();
+                String  fid      = (String) transFidComboBox.getSelectedItem();
+                String  comoName = (String) transComoComboBox.getSelectedItem();
+                boolean isBuy    = "BUY"  .equals(buyOrSellComboBox.getSelectedItem());
+                boolean isQuick  = "QUICK".equals(quickOrSlowComboBox.getSelectedItem());
+                double  rest, price;
+                try {rest  = Double.parseDouble( (String) transRestTextField.getText() );} catch (NumberFormatException ex) {rest = 0;}
+                try {price = Double.parseDouble( (String) priceTextField    .getText() );} catch (NumberFormatException ex) {price= 0;}
+
+                Log.it(  "<"+aid+"> via <"+fid+"> " + (isQuick?"QUICK":"SLOW") +" "+ (isBuy?"BUY":"SELL") +
+                        " <"+comoName+"> " + (isBuy?"#$":"#") +": "+ rest + " $: "+(isQuick?"AUTO":price) );
+
+                Trans.Req req;
+
+                if (isBuy) {
+                    double money = rest;
+                    if (isQuick) { req = Trans.mkQuickBuy(aid, fid, comoName, money);        }
+                    else         { req = Trans.mkSlowBuy (aid, fid, comoName, money, price); }
+                } else { // sell
+                    double num = rest;
+                    if (isQuick) { req = Trans.mkQuickSell(aid, fid, comoName, num);         }
+                    else         { req = Trans.mkSlowSell (aid, fid, comoName, num, price);  }
+                }
+
+                trh.send(req);
+            }
+        });
+
+        buyOrSellComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean isBuy = "BUY".equals(buyOrSellComboBox.getSelectedItem());
+                transRestLabel.setText( isBuy ? "#$:" : "#:" );
+            }
+        });
+
+        quickOrSlowComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean isQuick = "QUICK".equals(quickOrSlowComboBox.getSelectedItem());
+                priceTextField.setEnabled(!isQuick);
+            }
+        });
     }
+
 
 
 
@@ -82,8 +132,18 @@ public class TrhView implements ChangeListener {
 
         tikLabel.setText( Integer.toString(trh.getTik()) );
 
-        firmComboBox.setModel(new DefaultComboBoxModel( trh.getFIDsArray() ));
-        comoComboBox.setModel(new DefaultComboBoxModel( trh.getTabsArray() ));
+
+        ComboBoxModel aidsModel   = new DefaultComboBoxModel( trh.getAIDsArray() );
+        ComboBoxModel fidsModel1  = new DefaultComboBoxModel( trh.getFIDsArray() );
+        ComboBoxModel fidsModel2  = new DefaultComboBoxModel( trh.getFIDsArray() );
+        ComboBoxModel comosModel1 = new DefaultComboBoxModel( trh.getTabsArray() );
+        ComboBoxModel comosModel2 = new DefaultComboBoxModel( trh.getTabsArray() );
+
+        transAidComboBox .setModel(aidsModel);
+        transFidComboBox .setModel(fidsModel1);
+        firmComboBox     .setModel(fidsModel2);
+        comoComboBox     .setModel(comosModel1);
+        transComoComboBox.setModel(comosModel2);
 
         StringBuilder sb = new StringBuilder();
         for (final String str : trh.getLog()) {
@@ -127,8 +187,8 @@ public class TrhView implements ChangeListener {
 
         try {
 
-            trh.addAgentsFirm("Penuel Katz",kolonial);
-            trh.addAgentsFirm("Václav Rolný",poleAS);
+            trh.addFirm("Penuel Katz", kolonial);
+            trh.addFirm("Václav Rolný", poleAS);
 
 
         } catch (Trh.TrhException e) {
