@@ -1,6 +1,8 @@
 package cz.tomkren.trhy;
 
-import java.util.*;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 public class TrhTester {
 
@@ -85,7 +87,39 @@ public class TrhTester {
         InventoryDump afterDump = trh.getInventoryDump();
         return beforeDump.porovnej(afterDump, false);
     }
-    
+
+    public static final double P_OF_DUMP_PRICE = 0.1;
+
+
+    //TODO rozdelaný dodělat ....
+
+    private double getRandPrice(String comoName, boolean isBuy) {
+        PriceInfo pi = trh.getTabule(comoName).getPriceInfo();
+
+        if (pi.isEmpty()) {
+            return randDouble(1,100);
+        }
+
+        if (rand.nextDouble() < P_OF_DUMP_PRICE) {
+            return randDouble(pi.getLow(), pi.getHigh());
+        }
+
+        //TODO !!!!!!!!!!
+
+        if (isBuy) {
+            if (pi.isNothingToBuy()) {
+
+            } else {
+
+
+            }
+        } else {
+
+        }
+
+        throw new UnsupportedOperationException();
+    }
+
     private double randDouble (double from, double to) {
         return from + (to-from) * rand.nextDouble();
     }

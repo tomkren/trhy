@@ -34,6 +34,18 @@ public class PriceInfo {
         return minDemand != null ? minDemand : bestSupply;
     }
 
+    public boolean isEmpty () {
+        return isNothingToBuy() && isNothingToSell();
+    }
+    public boolean isNothingToBuy () {
+        return bestSupply == null;
+    }
+    public boolean isNothingToSell() {
+        return bestDemand == null;
+    }
+
+
+
     @Override
     public String toString() {
         return "[" + maxSupply +", " + bestSupply +", " + bestDemand +", " + minDemand +" ]";
