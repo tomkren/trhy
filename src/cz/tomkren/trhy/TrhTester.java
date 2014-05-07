@@ -19,6 +19,14 @@ public class TrhTester {
         this(t, null);
     }
 
+    public boolean sendRandomTrans(int n) {
+        for (int i = 0; i < n; i++) {
+            boolean isOK = sendRandomTrans();
+            if ( !isOK ) { return false; }
+        }
+        return true;
+    }
+
     public boolean sendRandomTrans() {
 
         Log.it("Sending random transaction..");
@@ -61,8 +69,7 @@ public class TrhTester {
             if (isQuick) {
                 req = Trans.mkQuickBuy(aid, fid, comoName, moneyForBuy); 
             } else {
-                // todo price
-                double price = 7777;
+                double price = getRandPrice(comoName, true);
                 req = Trans.mkSlowBuy(aid, fid, comoName, moneyForBuy, price);
             }
         } else { // sell
@@ -74,8 +81,7 @@ public class TrhTester {
             if (isQuick) {
                 req = Trans.mkQuickSell(aid, fid, comoName, numForSell);
             } else {
-                // todo price
-                double price = 8888;
+                double price = getRandPrice(comoName, false);
                 req = Trans.mkSlowSell(aid, fid, comoName, numForSell, price);
             }
         }
@@ -91,7 +97,7 @@ public class TrhTester {
     public static final double P_OF_DUMP_PRICE = 0.1;
 
 
-    //TODO rozdelaný dodělat ....
+    //TODO bug viz níže
 
     private double getRandPrice(String comoName, boolean isBuy) {
         PriceInfo pi = trh.getTabule(comoName).getPriceInfo();
@@ -101,23 +107,26 @@ public class TrhTester {
         }
 
         if (rand.nextDouble() < P_OF_DUMP_PRICE) {
-            return randDouble(pi.getLow(), pi.getHigh());
+            return randDouble(pi.getLow()-100, pi.getHigh()+100);
         }
-
-        //TODO !!!!!!!!!!
 
         if (isBuy) {
             if (pi.isNothingToBuy()) {
-
+                double bestDemand = pi.getBestDemand();
+                return randDouble(bestDemand-100,bestDemand);
             } else {
-
-
+                // TODO tady je někde bug, dosazuje to tam null
+                return randDouble(pi.getMinDemand(), pi.getBestDemand());
             }
-        } else {
-
+        } else { // sell
+            if (pi.isNothingToSell()) {
+                double bestSupply = pi.getBestSupply();
+                return randDouble(bestSupply, bestSupply+100);
+            } else {
+                //TODO to samý co vejš
+                return randDouble(pi.getBestSupply(), pi.getMaxSupply() );
+            }
         }
-
-        throw new UnsupportedOperationException();
     }
 
     private double randDouble (double from, double to) {
