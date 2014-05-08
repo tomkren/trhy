@@ -4,8 +4,6 @@ import cz.tomkren.observer.ChangeListener;
 import cz.tomkren.trhy.*;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 
 public class TrhView implements ChangeListener {
@@ -48,96 +46,76 @@ public class TrhView implements ChangeListener {
         Utils.mkFrameAndRegister("TrhView", panel, trh.getChangeInformer(), this);
         draw();
 
-        showFirmButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String fid = (String) firmComboBox.getSelectedItem();
+        showFirmButton.addActionListener(e -> {
+            String fid = (String) firmComboBox.getSelectedItem();
+            new FirmView( trh.getFirm(fid) );
+        });
+
+        showTabuleButton.addActionListener(e -> {
+            String comoName = (String) comoComboBox.getSelectedItem();
+            new TabuleView( trh.getTabule(comoName) );
+        });
+
+        showAllFirmsButton.addActionListener(e -> {
+            for (String fid : trh.getFIDsArray()) {
                 new FirmView( trh.getFirm(fid) );
             }
         });
 
-        showTabuleButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String comoName = (String) comoComboBox.getSelectedItem();
+        showAllTablesButton.addActionListener(e -> {
+            for (String comoName : trh.getTabsArray()) {
                 new TabuleView( trh.getTabule(comoName) );
             }
         });
 
-        showAllFirmsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                for (String fid : trh.getFIDsArray()) {
-                    new FirmView( trh.getFirm(fid) );
-                }
+        sendTransactionButton.addActionListener(e -> {
+            String aid = (String) transAidComboBox.getSelectedItem();
+            String fid = (String) transFidComboBox.getSelectedItem();
+            String comoName = (String) transComoComboBox.getSelectedItem();
+            boolean isBuy = "BUY".equals(buyOrSellComboBox.getSelectedItem());
+            boolean isQuick = "QUICK".equals(quickOrSlowComboBox.getSelectedItem());
+            double rest, price;
+            try {
+                rest = Double.parseDouble(transRestTextField.getText());
+            } catch (NumberFormatException ex) {
+                rest = 0;
             }
+            try {
+                price = Double.parseDouble(priceTextField.getText());
+            } catch (NumberFormatException ex) {
+                price = 0;
+            }
+
+            Log.it("<" + aid + "> via <" + fid + "> " + (isQuick ? "QUICK" : "SLOW") + " " + (isBuy ? "BUY" : "SELL") +
+                    " <" + comoName + "> " + (isBuy ? "#$" : "#") + ": " + rest + " $: " + (isQuick ? "AUTO" : price));
+
+            Trans.Req req = isBuy ? (isQuick ? Trans.mkQuickBuy(aid, fid, comoName, rest)
+                    : Trans.mkSlowBuy(aid, fid, comoName, rest, price))
+                    : (isQuick ? Trans.mkQuickSell(aid, fid, comoName, rest)
+                    : Trans.mkSlowSell(aid, fid, comoName, rest, price));
+
+            trh.send(req);
         });
 
-        showAllTablesButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                for (String comoName : trh.getTabsArray()) {
-                    new TabuleView( trh.getTabule(comoName) );
-                }
-            }
+        buyOrSellComboBox.addActionListener(e -> {
+            boolean isBuy = "BUY".equals(buyOrSellComboBox.getSelectedItem());
+            transRestLabel.setText( isBuy ? "#$:" : "#:" );
         });
 
-        sendTransactionButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String aid = (String) transAidComboBox.getSelectedItem();
-                String fid = (String) transFidComboBox.getSelectedItem();
-                String comoName = (String) transComoComboBox.getSelectedItem();
-                boolean isBuy = "BUY".equals(buyOrSellComboBox.getSelectedItem());
-                boolean isQuick = "QUICK".equals(quickOrSlowComboBox.getSelectedItem());
-                double rest, price;
-                try {
-                    rest = Double.parseDouble(transRestTextField.getText());
-                } catch (NumberFormatException ex) {
-                    rest = 0;
-                }
-                try {
-                    price = Double.parseDouble(priceTextField.getText());
-                } catch (NumberFormatException ex) {
-                    price = 0;
-                }
-
-                Log.it("<" + aid + "> via <" + fid + "> " + (isQuick ? "QUICK" : "SLOW") + " " + (isBuy ? "BUY" : "SELL") +
-                        " <" + comoName + "> " + (isBuy ? "#$" : "#") + ": " + rest + " $: " + (isQuick ? "AUTO" : price));
-
-                Trans.Req req = isBuy ? (isQuick ? Trans.mkQuickBuy(aid, fid, comoName, rest)
-                        : Trans.mkSlowBuy(aid, fid, comoName, rest, price))
-                        : (isQuick ? Trans.mkQuickSell(aid, fid, comoName, rest)
-                        : Trans.mkSlowSell(aid, fid, comoName, rest, price));
-
-                trh.send(req);
-            }
-        });
-
-        buyOrSellComboBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                boolean isBuy = "BUY".equals(buyOrSellComboBox.getSelectedItem());
-                transRestLabel.setText( isBuy ? "#$:" : "#:" );
-            }
-        });
-
-        quickOrSlowComboBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                boolean isQuick = "QUICK".equals(quickOrSlowComboBox.getSelectedItem());
-                priceTextField.setEnabled(!isQuick);
-            }
+        quickOrSlowComboBox.addActionListener(e -> {
+            boolean isQuick = "QUICK".equals(quickOrSlowComboBox.getSelectedItem());
+            priceTextField.setEnabled(!isQuick);
         });
 
         nSpinner.setValue(1);
-        sendRandTransButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int n = (Integer) nSpinner.getValue();
-                Log.it("Sending "+ n +"random transactions, yeehaa!");
-                trhTester.sendRandomTrans(n);
-            }
+        sendRandTransButton.addActionListener(e -> {
+            int n = (Integer) nSpinner.getValue();
+            Log.it("Sending "+ n +" random transactions, yeehaa!");
+
+            setAutoUpdate(false);
+            trhTester.sendRandomTrans(n);
+            setAutoUpdate(true);
+            draw();
         });
     }
 
@@ -145,11 +123,11 @@ public class TrhView implements ChangeListener {
 
         tikLabel.setText( Integer.toString(trh.getTik()) );
 
-        ComboBoxModel<String> aidsModel   = new DefaultComboBoxModel<String>( trh.getAIDsArray() );
-        ComboBoxModel<String> fidsModel1  = new DefaultComboBoxModel<String>( trh.getFIDsArray() );
-        ComboBoxModel<String> fidsModel2  = new DefaultComboBoxModel<String>( trh.getFIDsArray() );
-        ComboBoxModel<String> comosModel1 = new DefaultComboBoxModel<String>( trh.getTabsArray() );
-        ComboBoxModel<String> comosModel2 = new DefaultComboBoxModel<String>( trh.getTabsArray() );
+        ComboBoxModel<String> aidsModel   = new DefaultComboBoxModel<>( trh.getAIDsArray() );
+        ComboBoxModel<String> fidsModel1  = new DefaultComboBoxModel<>( trh.getFIDsArray() );
+        ComboBoxModel<String> fidsModel2  = new DefaultComboBoxModel<>( trh.getFIDsArray() );
+        ComboBoxModel<String> comosModel1 = new DefaultComboBoxModel<>( trh.getTabsArray() );
+        ComboBoxModel<String> comosModel2 = new DefaultComboBoxModel<>( trh.getTabsArray() );
 
         transAidComboBox .setModel(aidsModel);
         transFidComboBox .setModel(fidsModel1);
@@ -164,9 +142,15 @@ public class TrhView implements ChangeListener {
         logTextArea.setText(sb.toString());
     }
 
+    private void setAutoUpdate(boolean autoUpdate) {
+        this.autoUpdate = autoUpdate;
+    }
+
     @Override
     public void onChange() {
-        draw();
+        if (autoUpdate) {
+            draw();
+        }
     }
 
     public static void main(String[] args) {

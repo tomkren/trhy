@@ -61,7 +61,7 @@ public class Tabule {
             boolean isSupply = rowType == RowType.SUPPLY ;
             String key = isSupply ? commodity.getName() : "$"       ;
             Double val = isSupply ? getNum()            : getValue();
-            return new AbstractMap.SimpleImmutableEntry<String, Double>(key, val);
+            return new AbstractMap.SimpleImmutableEntry<>(key, val);
         }
     }
     private void addSupplyRow (int transID, String agentID, String firmID, double price, double num, int tik) {
@@ -74,8 +74,8 @@ public class Tabule {
     public Tabule(Commodity commodity) {
         this.commodity = commodity;
         int initialCapacity = 11; //11 je prej default
-        supply = new PriorityQueue<Row>(initialCapacity, new MinRowComparator()); 
-        demand = new PriorityQueue<Row>(initialCapacity, new MaxRowComparator());
+        supply = new PriorityQueue<>(initialCapacity, new MinRowComparator());
+        demand = new PriorityQueue<>(initialCapacity, new MaxRowComparator());
         changeInformer = new ChangeInformer();
     }
 
@@ -117,7 +117,7 @@ public class Tabule {
     }
 
     private List<Trans.Res> addBuy (BuyOpts buyOpts) {
-        List<Trans.Res> ret = new LinkedList<Trans.Res>();
+        List<Trans.Res> ret = new LinkedList<>();
 
         Trans.Buy buyReq = buyOpts.buyReq;
         double myPrice = buyReq.getPrice();
@@ -147,7 +147,7 @@ public class Tabule {
     }
 
     private List<Trans.Res> addSell (SellOpts sellOpts) {
-        List<Trans.Res> ret = new LinkedList<Trans.Res>();
+        List<Trans.Res> ret = new LinkedList<>();
 
         Trans.Sell sellReq = sellOpts.sellReq;
         double myPrice = sellReq.getPrice();
@@ -316,7 +316,7 @@ public class Tabule {
         
         Trans.Req req = Trans.mkQuickBuy("otrokář", "OtrociAS", "Koláč", 42000 + 430 );
         List<Trans.Res> results = t.add(req, 77, 1234);
-        for (Trans.Res res : results) { Log.it(res); }
+        results.forEach(Log::it);
 
         Log.it();
         Log.it(t);

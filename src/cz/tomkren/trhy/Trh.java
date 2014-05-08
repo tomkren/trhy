@@ -25,15 +25,15 @@ public class Trh {
     private ChangeInformer changeInformer;
 
     public Trh () {
-        tabs      = new HashMap<String, Tabule>();
-        firms     = new HashMap<String, Firm>();
-        ownership = new HashMap<String, Set<String>>();
+        tabs      = new HashMap<>();
+        firms     = new HashMap<>();
+        ownership = new HashMap<>();
 
-        AIDs = new LinkedList<String>();
+        AIDs = new LinkedList<>();
 
         numTrans   = 0;
         currentTik = 0;
-        log = new LinkedList<String>();
+        log = new LinkedList<>();
 
         isSilent = false;
 
@@ -104,9 +104,7 @@ public class Trh {
 
 
     private void performResultsUpdate (List<Trans.Res> rs) {
-        for (Trans.Res r : rs) {
-            performResultUpdate(r);
-        }
+        rs.forEach(this::performResultUpdate);
     }
 
     private void performResultUpdate (Trans.Res res) {
@@ -223,7 +221,7 @@ public class Trh {
         Set<String> hisFirmIDs = ownership.get(agentID);
         
         if (hisFirmIDs == null) {
-            hisFirmIDs = new HashSet<String>();
+            hisFirmIDs = new HashSet<>();
             ownership.put(agentID, hisFirmIDs);
         }
         
