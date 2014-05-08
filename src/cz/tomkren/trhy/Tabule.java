@@ -301,9 +301,9 @@ public class Tabule {
         t.addSupplyRow(1, "pekař", "Pekař&Syn", 42, 10  ,1);
         t.addSupplyRow(2, "pekař2", "Pekař&Syn2", 43, 110 ,5);
 
-        t.addDemandRow(30, "otrokář", "UKsro",    41  ,   3, 100);
+        t.addDemandRow(30, "otrokář", "UK s.r.o.",    41  ,   3, 100);
         t.addDemandRow(10, "žid",     "Koloniál", 40  ,  10, 20 );
-        t.addDemandRow(20, "otrokář", "UKsro",    41.5, 110, 3  );
+        t.addDemandRow(20, "otrokář", "UK s.r.o.",    41.5, 110, 3  );
 
 
         Log.it();
@@ -315,9 +315,8 @@ public class Tabule {
         
         
         Trans.Req req = Trans.mkQuickBuy("otrokář", "OtrociAS", "Koláč", 42000 + 430 );
-        List<Trans.Res> ress = t.add(req, 77, 1234);
-        
-        for (Trans.Res res : ress) { Log.it(res); }
+        List<Trans.Res> results = t.add(req, 77, 1234);
+        for (Trans.Res res : results) { Log.it(res); }
 
         Log.it();
         Log.it(t);
