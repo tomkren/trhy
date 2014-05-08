@@ -14,7 +14,7 @@ public class Trh {
     private Map<String,Tabule>      tabs;      // komodita -> tabule tý komodity
     private Map<String,Firm>        firms;     // firmID   -> majetek tý firmy   
     private Map<String,Set<String>> ownership; // agentID  -> mn. firmID co má
-                                               // pozdějc bude fikanějc, aby
+                                               // později bude fikaněji, aby
                                                // šli i jiný vztahy než má
     private List<String> AIDs;
     private int currentTik;   // současný tik simulace (inkrementuje se po jedné akci)
@@ -59,7 +59,7 @@ public class Trh {
 
 //~~~~ ~~~~~ ~~~~ ~~~~~ ~~~~ ~~ ~~~~~ ~~~~~ ~~~~~~ ~~~~~ ~~~~
 
-    //  TODO výstup metody send je, aby pak agent trhu mohl informovat agenty manažírků.
+    // výstup metody send je, aby pak agent trhu mohl informovat agenty manažírků.
     public List<Trans.Res> send (Trans.Req req) {
 
         log(req.toString());
@@ -230,7 +230,7 @@ public class Trh {
         hisFirmIDs.add(firmID);
         firms.put(firmID, hisFirm);
 
-        // projdi všechny komodity a pokud pro ně ještě neni trh tak ho udělej..
+        // projdi všechny komodity a pokud pro ně ještě není trh tak ho udělej..
         for (Map.Entry<String, Firm.Elem> entry : hisFirm.getInventoryMap().entrySet()) {
             String como = entry.getKey();
             if (!tabs.containsKey(como)) {
@@ -314,9 +314,9 @@ public class Trh {
 
             if (newNum < 0) {
                 firm.addCommodity(commodity, sell.getNum());
-                throw new TrhException("Komodita " + commodity + " ve firme " +
-                        req.getFID() + " se dostala pod nulu, operace byla zvracena."+
-                        "Bylo by tam mnozstvi " + newNum + ".");
+                throw new TrhException("Komodita " + commodity + " ve firmě " +
+                        req.getFID() + " se dostala pod nulu, operace byla zvrácena."+
+                        "Bylo by tam množství " + newNum + ".");
             }
 
 
@@ -327,8 +327,8 @@ public class Trh {
 
             if (newMoney < 0) {
                 firm.addMoney( buy.getMoney() );
-                throw new TrhException("Peníze ve firme " +
-                        req.getFID() + " se dostali pod nulu, operace byla zvracena."+
+                throw new TrhException("Peníze ve firmě " +
+                        req.getFID() + " se dostali pod nulu, operace byla zvrácena."+
                         "Bylo by tam $" + newMoney + ".");
             }
         }

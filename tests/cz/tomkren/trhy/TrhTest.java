@@ -36,7 +36,7 @@ public class TrhTest {
 
     @org.junit.Test
     public void manyRandomTransactions() {
-        assertTrue(trhTester.sendRandomTrans(100));
+        assertTrue(trhTester.sendRandomTrans(500));
     }
 
 }

@@ -115,16 +115,25 @@ public class TrhTester {
                 double bestDemand = pi.getBestDemand();
                 return randDouble(bestDemand-100,bestDemand);
             } else {
-                // TODO tady je někde bug, dosazuje to tam null
-                return randDouble(pi.getMinDemand(), pi.getBestDemand());
+                // víme že je co koupit, ale! můžeme být první co se snaží kupit něco
+                if (pi.isNothingToSell()) {
+                    double bestSupply = pi.getBestSupply();
+                    return randDouble(bestSupply-100, bestSupply);
+                } else {
+                    return randDouble(pi.getMinDemand(), pi.getBestDemand());
+                }
             }
         } else { // sell
             if (pi.isNothingToSell()) {
                 double bestSupply = pi.getBestSupply();
                 return randDouble(bestSupply, bestSupply+100);
             } else {
-                //TODO to samý co vejš
-                return randDouble(pi.getBestSupply(), pi.getMaxSupply() );
+                if (pi.isNothingToBuy()) {
+                    double bestDemand = pi.getBestDemand();
+                    return randDouble(bestDemand,bestDemand+100);
+                } else {
+                    return randDouble(pi.getBestSupply(), pi.getMaxSupply() );
+                }
             }
         }
     }

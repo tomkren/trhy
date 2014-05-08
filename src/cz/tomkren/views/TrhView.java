@@ -1,10 +1,7 @@
 package cz.tomkren.views;
 
 import cz.tomkren.observer.ChangeListener;
-import cz.tomkren.trhy.Firm;
-import cz.tomkren.trhy.Log;
-import cz.tomkren.trhy.Trans;
-import cz.tomkren.trhy.Trh;
+import cz.tomkren.trhy.*;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -13,7 +10,11 @@ import java.awt.event.ActionListener;
 
 public class TrhView implements ChangeListener {
 
+    private static final boolean USE_SYSTEM_LOOK_AND_FEEL = false;
+
     private Trh trh;
+    private boolean autoUpdate;
+
 
     private JLabel tikLabel;
     private JPanel panel;
@@ -33,13 +34,17 @@ public class TrhView implements ChangeListener {
     private JComboBox<String> transComoComboBox;
     private JTextField priceTextField;
     private JTextField transRestTextField;
-    private JButton    sendButton;
+    private JButton sendTransactionButton;
     private JLabel transRestLabel;
     private JComboBox<String> transAidComboBox;
+    private JButton sendRandTransButton;
+    private JSpinner nSpinner;
 
 
     public TrhView(Trh t) {
         trh = t;
+        autoUpdate = true;
+        final TrhTester trhTester = new TrhTester(t);
         Utils.mkFrameAndRegister("TrhView", panel, trh.getChangeInformer(), this);
         draw();
 
@@ -77,25 +82,33 @@ public class TrhView implements ChangeListener {
             }
         });
 
-        sendButton.addActionListener(new ActionListener() {
+        sendTransactionButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String  aid      = (String) transAidComboBox.getSelectedItem();
-                String  fid      = (String) transFidComboBox.getSelectedItem();
-                String  comoName = (String) transComoComboBox.getSelectedItem();
-                boolean isBuy    = "BUY"  .equals(buyOrSellComboBox.getSelectedItem());
-                boolean isQuick  = "QUICK".equals(quickOrSlowComboBox.getSelectedItem());
-                double  rest, price;
-                try {rest  = Double.parseDouble(transRestTextField.getText());} catch (NumberFormatException ex) {rest = 0;}
-                try {price = Double.parseDouble(priceTextField    .getText());} catch (NumberFormatException ex) {price= 0;}
+                String aid = (String) transAidComboBox.getSelectedItem();
+                String fid = (String) transFidComboBox.getSelectedItem();
+                String comoName = (String) transComoComboBox.getSelectedItem();
+                boolean isBuy = "BUY".equals(buyOrSellComboBox.getSelectedItem());
+                boolean isQuick = "QUICK".equals(quickOrSlowComboBox.getSelectedItem());
+                double rest, price;
+                try {
+                    rest = Double.parseDouble(transRestTextField.getText());
+                } catch (NumberFormatException ex) {
+                    rest = 0;
+                }
+                try {
+                    price = Double.parseDouble(priceTextField.getText());
+                } catch (NumberFormatException ex) {
+                    price = 0;
+                }
 
                 Log.it("<" + aid + "> via <" + fid + "> " + (isQuick ? "QUICK" : "SLOW") + " " + (isBuy ? "BUY" : "SELL") +
                         " <" + comoName + "> " + (isBuy ? "#$" : "#") + ": " + rest + " $: " + (isQuick ? "AUTO" : price));
 
-                Trans.Req req = isBuy ? ( isQuick ? Trans.mkQuickBuy (aid, fid, comoName, rest)
-                                                  : Trans.mkSlowBuy  (aid, fid, comoName, rest, price) )
-                                      : ( isQuick ? Trans.mkQuickSell(aid, fid, comoName, rest)
-                                                  : Trans.mkSlowSell (aid, fid, comoName, rest, price) ) ;
+                Trans.Req req = isBuy ? (isQuick ? Trans.mkQuickBuy(aid, fid, comoName, rest)
+                        : Trans.mkSlowBuy(aid, fid, comoName, rest, price))
+                        : (isQuick ? Trans.mkQuickSell(aid, fid, comoName, rest)
+                        : Trans.mkSlowSell(aid, fid, comoName, rest, price));
 
                 trh.send(req);
             }
@@ -114,6 +127,16 @@ public class TrhView implements ChangeListener {
             public void actionPerformed(ActionEvent e) {
                 boolean isQuick = "QUICK".equals(quickOrSlowComboBox.getSelectedItem());
                 priceTextField.setEnabled(!isQuick);
+            }
+        });
+
+        nSpinner.setValue(1);
+        sendRandTransButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int n = (Integer) nSpinner.getValue();
+                Log.it("Sending "+ n +"random transactions, yeehaa!");
+                trhTester.sendRandomTrans(n);
             }
         });
     }
@@ -148,10 +171,12 @@ public class TrhView implements ChangeListener {
 
     public static void main(String[] args) {
 
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            Log.it("Unable to set native look and feel, sorry.");
+        if (USE_SYSTEM_LOOK_AND_FEEL) {
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception e) {
+                Log.it("Unable to set native look and feel, sorry.");
+            }
         }
 
         Trh trh = new Trh();
