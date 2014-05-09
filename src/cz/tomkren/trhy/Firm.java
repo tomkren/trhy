@@ -85,7 +85,9 @@ public class Firm {
     }
 
     public InventoryDump getInventoryDump() {
-        return new InventoryDump(this);
+        InventoryDump dump = new InventoryDump(inventory.entrySet());
+        dump.add(new InventoryDump("$", money));
+        return dump;
     }
 
     public boolean hasEnoughMoney (double m) {

@@ -8,46 +8,49 @@ public class InventoryDump {
 
     private Map<String,Double> dump;
 
-    public static interface Dumpable {
-        Map.Entry<String,Double> dump();
-    }
-
     public InventoryDump () {
         dump = new HashMap<>();
+    }
+
+    private void updateDump(String key, Double newVal) {
+        Double oldVal = dump.get(key);
+        if (oldVal == null) {
+            dump.put(key, newVal);
+        } else {
+            dump.put(key, oldVal+newVal);
+        }
+    }
+
+    public InventoryDump (String key, double val) {
+        this();
+        updateDump(key, val);
+    }
+
+    public InventoryDump (Set<Map.Entry<String, Stuff>> set) {
+        this();
+        for (Map.Entry<String, Stuff> e  : set) {
+            updateDump(e.getKey(), e.getValue().getNum());
+        }
+    }
+
+    public static interface Dumpable {
+        Map.Entry<String,Double> dump();
     }
 
     public InventoryDump (Collection<? extends Dumpable> xs) {
         this();
         for (Dumpable x : xs) {
             Map.Entry<String,Double> e = x.dump();
-            String key = e.getKey();
-            Double val = e.getValue();
-            Double oldVal = dump.get(key);
-            if (oldVal == null) {
-                dump.put(key, val);
-            } else {
-                dump.put(key, oldVal+val);
-            }
+            updateDump(e.getKey(), e.getValue());
         }
     }
 
     public List<String> getComoNames(boolean includeMoney, boolean includeMachines) {
         return dump.keySet().stream()
-                            .filter(cName -> (includeMoney || !cName.equals("$")) && (includeMachines || !Machine.isMachineName(cName)) )
-                            .collect(Collectors.toList());
+                .filter(cName -> (includeMoney || !cName.equals("$")) && (includeMachines || !Machine.isMachineName(cName)) )
+                .collect(Collectors.toList());
     }
 
-    // todo pokusit se o decouple
-    public InventoryDump (Firm firm) {
-        this();
-
-        dump.put("$", firm.getMoney() );
-
-        for (Map.Entry<String, Stuff> entry : firm.getInventoryMap().entrySet()) {
-            dump.put(entry.getKey(), entry.getValue().getNum());
-        }
-    }
-    
     public void add( InventoryDump inventoryDump2 ) {
         for (Map.Entry<String,Double> e : inventoryDump2.dump.entrySet()) {
             String key = e.getKey();
