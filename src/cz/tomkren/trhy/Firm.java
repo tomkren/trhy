@@ -63,14 +63,6 @@ public class Firm {
         }
     }
 
-    public List<String> getComoNames (boolean includeBasic, boolean includeMachine, boolean includeMoney) {
-
-        //inventory.entrySet().stream().filter(entry->true).collect(Collectors.toList());
-
-
-        throw new UnsupportedOperationException();
-    }
-
     public ChangeInformer getChangeInformer() {
         return changeInformer;
     }
