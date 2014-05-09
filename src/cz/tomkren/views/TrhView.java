@@ -8,8 +8,6 @@ import javax.swing.*;
 
 public class TrhView implements ChangeListener {
 
-    private static final boolean USE_SYSTEM_LOOK_AND_FEEL = false;
-
     private Trh trh;
     private boolean autoUpdate;
 
@@ -37,6 +35,7 @@ public class TrhView implements ChangeListener {
     private JComboBox<String> transAidComboBox;
     private JButton sendRandTransButton;
     private JSpinner nSpinner;
+    private JCheckBox includeMachinesCheckBox;
 
 
     public TrhView(Trh t) {
@@ -109,37 +108,53 @@ public class TrhView implements ChangeListener {
 
         nSpinner.setValue(1000);
         sendRandTransButton.addActionListener(e -> {
-            int n = (Integer) nSpinner.getValue();
-            Log.it("Sending "+ n +" random transactions, yeehaa!");
 
-            setAutoUpdate(false);
-            trhTester.sendRandomTrans(n);
-            setAutoUpdate(true);
-            draw();
+            int n = (Integer) nSpinner.getValue();
+            boolean includeMachines = includeMachinesCheckBox.isSelected();
+
+            //Log.it("Sending "+ n +" random transactions, yeehaa!");
+
+            //setAutoUpdate(false);
+            //trhTester.sendRandomTrans(n,includeMachines);
+            //setAutoUpdate(true);
+            //draw();
+
+            doWithoutRedrawsThenRedraw(()->trhTester.sendRandomTrans(n,includeMachines));
         });
     }
 
-    public void draw() {
+    private void doWithoutRedrawsThenRedraw (MyUtils.VoidAction a) {
+        setAutoUpdate(false);
+        a.doIt();
+        setAutoUpdate(true);
+        draw();
+    }
 
+
+    private void draw() {
         tikLabel.setText( Integer.toString(trh.getTik()) );
 
-        ComboBoxModel<String> aidsModel   = new DefaultComboBoxModel<>( trh.getAIDsArray() );
-        ComboBoxModel<String> fidsModel1  = new DefaultComboBoxModel<>( trh.getFIDsArray() );
-        ComboBoxModel<String> fidsModel2  = new DefaultComboBoxModel<>( trh.getFIDsArray() );
-        ComboBoxModel<String> comosModel1 = new DefaultComboBoxModel<>( trh.getTabsArray() );
-        ComboBoxModel<String> comosModel2 = new DefaultComboBoxModel<>( trh.getTabsArray() );
+        String[] aids, fids, tabs;
+        aids = trh.getAIDsArray();
+        fids = trh.getFIDsArray();
+        tabs = trh.getTabsArray();
 
-        transAidComboBox .setModel(aidsModel);
-        transFidComboBox .setModel(fidsModel1);
-        firmComboBox     .setModel(fidsModel2);
-        comoComboBox     .setModel(comosModel1);
-        transComoComboBox.setModel(comosModel2);
+        loadComboBox(transAidComboBox  , aids );
+        loadComboBox(transFidComboBox  , fids );
+        loadComboBox(firmComboBox      , fids );
+        loadComboBox(comoComboBox      , tabs );
+        loadComboBox(transComoComboBox , tabs );
 
         StringBuilder sb = new StringBuilder();
         for (final String str : trh.getLog()) {
             sb.append(str).append("\n");
         }
         logTextArea.setText(sb.toString());
+    }
+
+    private static void loadComboBox (JComboBox<String> comboBox, String[] strings) {
+        ComboBoxModel<String> model = new DefaultComboBoxModel<>( strings );
+        comboBox.setModel(model);
     }
 
     private void setAutoUpdate(boolean autoUpdate) {
@@ -153,8 +168,10 @@ public class TrhView implements ChangeListener {
         }
     }
 
-    public static void main(String[] args) {
+    private static final boolean USE_SYSTEM_LOOK_AND_FEEL = false;
+    private static final boolean USE_NIMBUS_LOOK_AND_FEEL = true;
 
+    private static void setLookAndFeel () {
         if (USE_SYSTEM_LOOK_AND_FEEL) {
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -162,6 +179,24 @@ public class TrhView implements ChangeListener {
                 Log.it("Unable to set native look and feel, sorry.");
             }
         }
+
+        if (USE_NIMBUS_LOOK_AND_FEEL) {
+            try {
+                for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                    if ("Nimbus".equals(info.getName())) {
+                        UIManager.setLookAndFeel(info.getClassName());
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                Log.it("Unable to set Nimbus look and feel, sorry.");
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+
+        setLookAndFeel();
 
         Trh trh = new Trh();
         new TrhView(trh);

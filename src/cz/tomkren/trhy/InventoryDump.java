@@ -31,9 +31,9 @@ public class InventoryDump {
         }
     }
 
-    public List<String> getComoNames(boolean includeMoney) {
+    public List<String> getComoNames(boolean includeMoney, boolean includeMachines) {
         return dump.keySet().stream()
-                            .filter(cName -> includeMoney || !cName.equals("$"))
+                            .filter(cName -> (includeMoney || !cName.equals("$")) && (includeMachines || !Machine.isMachineName(cName)) )
                             .collect(Collectors.toList());
     }
 

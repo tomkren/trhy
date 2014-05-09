@@ -9,6 +9,10 @@ public class MyUtils {
         return a == b || Math.abs(a-b) < EPSILON;
     }
 
+    public interface VoidAction {
+        public void doIt();
+    }
+
     public static <T> T randSetElem (Random rand, Set<T> set) {
         int i = rand.nextInt( set.size() );
         int j = 0;

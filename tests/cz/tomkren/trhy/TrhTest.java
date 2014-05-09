@@ -31,12 +31,12 @@ public class TrhTest {
 
     @org.junit.Test
     public void randomTransaction() {
-        assertTrue(trhTester.sendRandomTrans());
+        assertTrue(trhTester.sendRandomTrans(false));
     }
 
     @org.junit.Test
     public void manyRandomTransactions() {
-        assertTrue(trhTester.sendRandomTrans(1000));
+        assertTrue(trhTester.sendRandomTrans(1000, false));
     }
 
 }

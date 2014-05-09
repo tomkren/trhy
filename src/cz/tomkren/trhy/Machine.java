@@ -7,6 +7,10 @@ public interface Machine {
     public boolean checkInput (Stuff input);
     public String  getName ();
 
+    // todo trochu debilní/hax
+    public static boolean isMachineName(String str) {
+        return str.contains("->");
+    }
 
 
     public class Basic implements Machine {

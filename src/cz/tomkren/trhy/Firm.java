@@ -4,6 +4,7 @@ import cz.tomkren.observer.ChangeInformer;
 import cz.tomkren.observer.ChangeInformerService;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -61,6 +62,14 @@ public class Firm {
                 inventory.put(it.getCommodity().getName(),new Stuff.Basic(it.getCommodity(),it.getNum()));
             }
         }
+    }
+
+    public List<String> getComoNames (boolean includeBasic, boolean includeMachine, boolean includeMoney) {
+
+        //inventory.entrySet().stream().filter(entry->true).collect(Collectors.toList());
+
+
+        throw new UnsupportedOperationException();
     }
 
     public ChangeInformerService getChangeInformer() {

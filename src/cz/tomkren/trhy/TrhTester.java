@@ -20,15 +20,15 @@ public class TrhTester {
     }
 
     // TODO pro 1000 dělá divnosti, prozkoumat proč
-    public boolean sendRandomTrans(int n) {
+    public boolean sendRandomTrans(int n, boolean includeMachines) {
         for (int i = 0; i < n; i++) {
-            boolean isOK = sendRandomTrans();
+            boolean isOK = sendRandomTrans(includeMachines);
             if ( !isOK ) { return false; }
         }
         return true;
     }
 
-    public boolean sendRandomTrans() {
+    public boolean sendRandomTrans(boolean includeMachines) {
 
         Log.it("Sending random transaction..");
 
@@ -51,7 +51,7 @@ public class TrhTester {
         Log.it("firm: "+ fid + " ... " +firmDump);
 
         // select commodity
-        List<String> comoNames = firmDump.getComoNames(false);
+        List<String> comoNames = firmDump.getComoNames(false, includeMachines);
         String comoName = comoNames.get(rand.nextInt(comoNames.size()));
 
         Log.it("como: "+ comoName);
