@@ -15,11 +15,11 @@ public class Firm {
         public static Firm mkKolonialKatz() {
             return new Firm(
                     "Koloniál Katz", //Penuel Katz
-                    new Item[]{
-                            Item.basic("$",100000),
-                            Item.basic("Work",5),
-                            Item.basic("Flour",5000),
-                            Item.basic("Pie",100)
+                    new Stuff[]{
+                            Stuff.money(100000),
+                            Stuff.basic("Work",5),
+                            Stuff.basic("Flour",5000),
+                            Stuff.basic("Pie",100)
                     }
             );
         }
@@ -27,11 +27,11 @@ public class Firm {
         public static Firm mkPoleAS() {
             return new Firm(
                     "Pole a.s.",
-                    new Item[]{
-                            Item.basic("$",1000),
-                            Item.basic("Work",1000),
-                            Item.basic("Flour",5000),
-                            Item.machine("Work", "Flour", 2)
+                    new Stuff[]{
+                            Stuff.money(1000),
+                            Stuff.basic("Work",1000),
+                            Stuff.basic("Flour",5000),
+                            Stuff.machine("pole","Work", "Flour", 2)
                     }
             );
         }
@@ -52,16 +52,20 @@ public class Firm {
         changeInformer = new BasicChangeInformer();
     }
 
-    public Firm (String firmID, Item[] items) {
+
+
+    public Firm (String firmID, Stuff[] stuffs) {
         this(firmID);
-        for (Item it : items) {
-            if (it.getCommodity().toString().equals("$")) {
-                money += it.getNum();
+        for (Stuff s : stuffs) {
+            if (s.getName().equals("$")) { // todo lepší něco jako ".. instanceof ..money"
+                money += s.getNum();
             } else {
-                inventory.put(it.getCommodity().getName(),new Stuff.Basic(it.getCommodity(),it.getNum()));
+                inventory.put(s.getName(), s);
             }
         }
     }
+
+
 
     public ChangeInformer getChangeInformer() {
         return changeInformer;
@@ -76,7 +80,12 @@ public class Firm {
             String key = entry.getKey();
             Stuff value = entry.getValue();
 
-            sb.append(key).append(" ... ").append(value.getNum()).append("\n");
+            sb.append(key).append(" ... ").append(value.getNum());
+
+            //todo u mašin vypsat i machineID
+            //if (value instanceof )
+
+            sb.append("\n");
         }
 
         //sb.append("... ").append( getInventoryDump() ).append("\n");
@@ -98,7 +107,14 @@ public class Firm {
         Stuff e = inventory.get(comoName);
         return e != null && e.getNum() >= num;
     }
-    
+
+    public double work (String machineID) {
+
+
+
+        throw new UnsupportedOperationException();
+    }
+
     public double addMoney (double delta) {
         money += delta;
         changeInformer.informListeners();

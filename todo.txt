@@ -1,5 +1,7 @@
 TODOs
 
+-> Vyřešit jak to udělat s machineID, nedělitelnými komoditami (jakože jejich počty musej bejt v intech) (což stroje určitě jsou)
+
 -> Refactor: Tabule.addBuy/addSell sjednotit do jedné Tabule.add
    - slo by lehčeji pokud by byli ve stejných jednotkách
 -> Zvážit zda nepředělat doubly (peníze a ks) na inty !!!!

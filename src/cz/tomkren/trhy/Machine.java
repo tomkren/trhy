@@ -6,6 +6,7 @@ public interface Machine {
     public Stuff   work (Stuff input);
     public boolean checkInput (Stuff input);
     public String  getName ();
+    public String  getMachineID();
 
     // todo trochu debilní/hax
     public static boolean isMachineName(String str) {
@@ -15,11 +16,13 @@ public interface Machine {
 
     public class Basic implements Machine {
 
+        private String machineID;
         private double beta;
         private Commodity inputComo;
         private Commodity outputComo;
 
-        public Basic(double beta, Commodity inputComo, Commodity outputComo) {
+        public Basic(String machineID, double beta, Commodity inputComo, Commodity outputComo) {
+            this.machineID = machineID;
             this.beta = beta;
             this.inputComo = inputComo;
             this.outputComo = outputComo;
@@ -46,6 +49,11 @@ public interface Machine {
         @Override
         public String getName() {
             return "( "+inputComo.getName() + " -"+beta+"-> "+ outputComo.getName() +" )";
+        }
+
+        @Override
+        public String getMachineID() {
+            return machineID;
         }
     }
 

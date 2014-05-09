@@ -117,8 +117,8 @@ public class Trh {
         Firm firm = firms.get( res.getFID() ); // todo pokud by byla možnost že se firma odhlásí z trhu, pak by se měla čekovat existence
 
         switch (effectType) {
-            case ADD_COMMODITY : firm.addCommodity(res.getComo(), res.getEffectVal()); break;
-            case ADD_MONEY     : firm.addMoney(                  res.getEffectVal() ); break;
+            case ADD_COMMODITY : firm.addCommodity(res.getComo(), res.getEffectVal() ); break;
+            case ADD_MONEY     : firm.addMoney(                   res.getEffectVal() ); break;
         }
     }
 
