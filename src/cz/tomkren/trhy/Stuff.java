@@ -20,10 +20,7 @@ public interface Stuff {
     }
 
     public static Stuff machine(String machineID, String inputCName, String outputCName, double beta) {
-        Machine m = new Machine.Basic(machineID, beta, new Commodity.Basic(inputCName) , new Commodity.Basic(outputCName) );
-
-        // todo neměl by bejt spešl sub typ pro stuff typu machine??
-        return new Basic( new Commodity.Mach(m) , 1);
+        return new Machine.SimpleMachine(machineID, beta, new Commodity.Basic(inputCName), new Commodity.Basic(outputCName) );
     }
 
 
@@ -46,6 +43,7 @@ public interface Stuff {
             return num;
         }
     }
+
 
 
     public class Fail implements Stuff {

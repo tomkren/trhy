@@ -5,27 +5,46 @@ public interface Machine {
 
     public Stuff   work (Stuff input);
     public boolean checkInput (Stuff input);
-    public String  getName ();
     public String  getMachineID();
 
-    // todo trochu debilní/hax
+    // todo debilní hax
     public static boolean isMachineName(String str) {
         return str.contains("->");
     }
 
 
-    public class Basic implements Machine {
+    // todo zapracovat do systému správně
+    public class SimpleMachine implements Machine, Stuff {
 
         private String machineID;
         private double beta;
         private Commodity inputComo;
         private Commodity outputComo;
+        private Commodity commodity;
 
-        public Basic(String machineID, double beta, Commodity inputComo, Commodity outputComo) {
+        public SimpleMachine(String machineID, double beta, Commodity inputComo, Commodity outputComo) {
             this.machineID = machineID;
             this.beta = beta;
             this.inputComo = inputComo;
             this.outputComo = outputComo;
+
+            commodity = new Commodity.Arrow(inputComo, outputComo);
+        }
+
+        @Override
+        public double getNum() {
+            return 1;
+        }
+
+        @Override
+        public double addNum(double delta) {
+            // todo předelat ty interfacey tak, aby se to nemuselo takle blbě
+            throw new UnsupportedOperationException("není možno přidávat počty mašin (rozdělaný a bude to udelaný jinač ...)");
+        }
+
+        @Override
+        public Commodity getComo() {
+            return commodity;
         }
 
         public boolean checkInput(Stuff input) {
@@ -46,10 +65,6 @@ public interface Machine {
             return new Stuff.Basic(outputComo, beta * input.getNum() );
         }
 
-        @Override
-        public String getName() {
-            return "( "+inputComo.getName() + " -"+beta+"-> "+ outputComo.getName() +" )";
-        }
 
         @Override
         public String getMachineID() {
