@@ -1,10 +1,9 @@
 package cz.tomkren.trhy;
 
+import cz.tomkren.observer.BasicChangeInformer;
 import cz.tomkren.observer.ChangeInformer;
-import cz.tomkren.observer.ChangeInformerService;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -44,13 +43,13 @@ public class Firm {
     private double money; // protože se do nich šahá opravdu často,
                           // nedáme je pro efektivitu do mapy 
 
-    private ChangeInformer changeInformer;
+    private BasicChangeInformer changeInformer;
 
     public Firm (String firmID) {
         this.firmID = firmID;
         inventory = new HashMap<>();
         money = 0;
-        changeInformer = new ChangeInformer();
+        changeInformer = new BasicChangeInformer();
     }
 
     public Firm (String firmID, Item[] items) {
@@ -72,7 +71,7 @@ public class Firm {
         throw new UnsupportedOperationException();
     }
 
-    public ChangeInformerService getChangeInformer() {
+    public ChangeInformer getChangeInformer() {
         return changeInformer;
     }
 

@@ -8,7 +8,7 @@ import java.awt.event.*;
 
 public class Utils {
 
-    public static JFrame mkFrameAndRegister(String name, Container container, ChangeInformerService informer, ChangeListener listener) {
+    public static JFrame mkFrameAndRegister(String name, Container container, ChangeInformer informer, ChangeListener listener) {
 
         informer.addListener(listener);
 
@@ -18,7 +18,7 @@ public class Utils {
         frame.pack();
         frame.setVisible(true);
 
-        final ChangeInformerService informer_ = informer;
+        final ChangeInformer informer_ = informer;
         final ChangeListener listener_ = listener;
         frame.addWindowListener(new WindowAdapter() {
             @Override

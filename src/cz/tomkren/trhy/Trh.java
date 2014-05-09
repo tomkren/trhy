@@ -1,7 +1,7 @@
 package cz.tomkren.trhy;
 
+import cz.tomkren.observer.BasicChangeInformer;
 import cz.tomkren.observer.ChangeInformer;
-import cz.tomkren.observer.ChangeInformerService;
 
 import java.util.*;
 
@@ -22,7 +22,7 @@ public class Trh {
     private List<String> log; // Trhový log.
     private boolean isSilent;
 
-    private ChangeInformer changeInformer;
+    private BasicChangeInformer changeInformer;
 
     public Trh () {
         tabs      = new HashMap<>();
@@ -37,10 +37,10 @@ public class Trh {
 
         isSilent = false;
 
-        changeInformer = new ChangeInformer();
+        changeInformer = new BasicChangeInformer();
     }
 
-    public ChangeInformerService getChangeInformer() {
+    public ChangeInformer getChangeInformer() {
         return changeInformer;
     }
 

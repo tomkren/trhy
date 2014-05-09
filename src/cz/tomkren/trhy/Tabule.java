@@ -1,7 +1,7 @@
 package cz.tomkren.trhy;
 
+import cz.tomkren.observer.BasicChangeInformer;
 import cz.tomkren.observer.ChangeInformer;
-import cz.tomkren.observer.ChangeInformerService;
 
 import java.util.*;
 
@@ -18,7 +18,7 @@ public class Tabule {
     private PriorityQueue<Row> supply;
     private PriorityQueue<Row> demand;
 
-    private ChangeInformer changeInformer;
+    private BasicChangeInformer changeInformer;
 
     public static enum RowType {SUPPLY, DEMAND}
 
@@ -76,10 +76,10 @@ public class Tabule {
         int initialCapacity = 11; //11 je prej default
         supply = new PriorityQueue<>(initialCapacity, new MinRowComparator());
         demand = new PriorityQueue<>(initialCapacity, new MaxRowComparator());
-        changeInformer = new ChangeInformer();
+        changeInformer = new BasicChangeInformer();
     }
 
-    public ChangeInformerService getChangeInformer() {
+    public ChangeInformer getChangeInformer() {
         return changeInformer;
     }
 

@@ -1,26 +1,6 @@
 package cz.tomkren.observer;
 
-import java.util.LinkedList;
-import java.util.List;
-
-public class ChangeInformer implements ChangeInformerService {
-    private List<ChangeListener> listeners;
-
-    public ChangeInformer () {
-        listeners = new LinkedList<ChangeListener>();
-    }
-
-    public void addListener (ChangeListener listener) {
-        listeners.add(listener);
-    }
-
-    public boolean removeListener (ChangeListener listener) {
-        return listeners.remove(listener);
-    }
-
-    public void informListeners() {
-        for (ChangeListener listener : listeners) {
-            listener.onChange();
-        }
-    }
+public interface ChangeInformer {
+    public void addListener (ChangeListener listener);
+    public boolean removeListener (ChangeListener listener);
 }
