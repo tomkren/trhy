@@ -112,6 +112,10 @@ public class Tabule {
         if (req instanceof Trans.Buy) { ret =  addBuy(new  BuyOpts((Trans.Buy) req, transID, currentTik)); }
         if (req instanceof Trans.Sell){ ret = addSell(new SellOpts((Trans.Sell)req, transID, currentTik)); }
 
+        if (ret == null) {
+            throw new Error("Unsupported req type in Tabule.add !!!");
+        }
+
         if (ret.isEmpty()) {
             // TODO nastává pro množství menší než epsilon
             throw new Error("Prázdný ret v Tabule.add !!!");
