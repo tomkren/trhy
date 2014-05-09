@@ -17,5 +17,15 @@ public abstract class Commodity {
         public Basic(String name) {this.name = name;}
         public String getName() {return name;}
     }
+
+    public static class Mach extends Commodity {
+        private Machine machine;
+        public Mach(Machine m) {
+            machine = m;
+        }
+        public String getName() {
+            return machine.getName();
+        }
+    }
     
 }

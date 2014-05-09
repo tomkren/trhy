@@ -10,7 +10,33 @@ import java.util.*;
  * @author Tomáš Křen
  */
 public class Firm {
-    
+
+    public static class Examples {
+        public static Firm mkKolonialKatz() {
+            return new Firm(
+                    "Koloniál Katz", //Penuel Katz
+                    new Item[]{
+                            Item.basic("$",100000),
+                            Item.basic("Work",5),
+                            Item.basic("Flour",5000),
+                            Item.basic("Pie",100)
+                    }
+            );
+        }
+
+        public static Firm mkPoleAS() {
+            return new Firm(
+                    "Pole a.s.",
+                    new Item[]{
+                            Item.basic("$",1000),
+                            Item.basic("Work",1000),
+                            Item.basic("Flour",5000),
+                            Item.machine("Work", "Flour", 2)
+                    }
+            );
+        }
+    }
+
     private String firmID;
     private Map<String,Stuff> inventory;
 
@@ -106,63 +132,6 @@ public class Firm {
         Stuff e = inventory.get(comoName);
         if (e == null) {return 0;}
         return e.getNum();
-    }
-
-    /*
-    public static interface Elem {
-        public Commodity getCommodity();
-        public double getNum();
-        public double addNum(double delta);
-
-    }
-    
-    public static class NumElem implements Elem {
-        double num;
-        Commodity como;
-
-        public Commodity getCommodity() {
-            return como;
-        }
-
-        public NumElem (Commodity c, double d) {
-            como = c;
-            num = d;
-        }
-        
-        public double getNum() {
-            return num;
-        } 
-        
-        public double addNum(double delta){
-            num += delta;
-            return num;
-        } 
-    }
-    */
-
-    public static class Examples {
-        public static Firm mkKolonialKatz() {
-            return new Firm(
-                "Koloniál Katz", //Penuel Katz
-                new Item[]{
-                        new Item("$",100000),
-                        new Item("Work",5),
-                        new Item("Flour",5000),
-                        new Item("Pie",100)
-                }
-            );
-        }
-
-        public static Firm mkPoleAS() {
-            return new Firm(
-                "Pole a.s.",
-                new Item[]{
-                        new Item("$",1000),
-                        new Item("Work",1000),
-                        new Item("Flour",5000)
-                }
-            );
-        }
     }
 
 }
