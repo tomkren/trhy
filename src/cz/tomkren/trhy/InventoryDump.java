@@ -86,7 +86,7 @@ public class InventoryDump {
         for (Map.Entry<String,Double> entry: dump.entrySet()) {
             double val1 = entry.getValue();
             double val2 = dump2.get(entry.getKey());
-            if ( !MyUtils.isAlmostTheSame(val1, val2) ) {
+            if ( !Utils.isAlmostTheSame(val1, val2) ) {
                 Log.it("nemečuje množství "+entry.getKey()+" "+val1+" != "+val2, isSilent);
                 return false;
             }

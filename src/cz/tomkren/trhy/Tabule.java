@@ -130,7 +130,7 @@ public class Tabule {
 
         int i = 0;
 
-        while (myMoney > MyUtils.EPSILON && !supply.isEmpty()) {
+        while (myMoney > Utils.EPSILON && !supply.isEmpty()) {
 
             Row supplyRow = supply.peek();
 
@@ -145,7 +145,7 @@ public class Tabule {
             if (i > 10000) {throw new Error("Stuck in while in Tabule.addBuy() !!!");}
         }
 
-        if (myMoney > MyUtils.EPSILON) {
+        if (myMoney > Utils.EPSILON) {
             if (buyReq.isQuick()) {
                 addBuyFailResult(ret, myMoney, buyOpts);
             } else {
@@ -164,7 +164,7 @@ public class Tabule {
         double myNum   = sellReq.getNum();
 
         int i = 0;
-        while (myNum > MyUtils.EPSILON && !demand.isEmpty()) {
+        while (myNum > Utils.EPSILON && !demand.isEmpty()) {
 
             Row demandRow = demand.peek();
 
@@ -179,7 +179,7 @@ public class Tabule {
             if (i > 10000) {throw new Error("Stuck in while in Tabule.addSell() !!!");}
         }
 
-        if (myNum > MyUtils.EPSILON) {
+        if (myNum > Utils.EPSILON) {
             if (sellReq.isQuick()) {
                 addSellFailResult(ret, myNum, sellOpts);
             } else {

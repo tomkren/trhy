@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class Utils {
+public class ViewUtils {
 
     public static JFrame mkFrameAndRegister(String name, Container container, ChangeInformer informer, ChangeListener listener) {
 

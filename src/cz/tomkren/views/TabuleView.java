@@ -15,7 +15,7 @@ public class TabuleView implements ChangeListener {
 
     public TabuleView(Tabule t) {
         tabule = t;
-        Utils.mkFrameAndRegister(tabule.getComoName() + " market table", panel, tabule.getChangeInformer(), this);
+        ViewUtils.mkFrameAndRegister(tabule.getComoName() + " market table", panel, tabule.getChangeInformer(), this);
         draw();
     }
 

@@ -42,7 +42,7 @@ public class TrhView implements ChangeListener {
         trh = t;
         autoUpdate = true;
         final TrhTester trhTester = new TrhTester(t);
-        Utils.mkFrameAndRegister("TrhView", panel, trh.getChangeInformer(), this);
+        ViewUtils.mkFrameAndRegister("TrhView", panel, trh.getChangeInformer(), this);
         draw();
 
         showFirmButton.addActionListener(e -> {
@@ -123,7 +123,7 @@ public class TrhView implements ChangeListener {
         });
     }
 
-    private void doWithoutRedrawsThenRedraw (MyUtils.VoidAction a) {
+    private void doWithoutRedrawsThenRedraw (Utils.VoidAction a) {
         setAutoUpdate(false);
         a.doIt();
         setAutoUpdate(true);
@@ -140,9 +140,9 @@ public class TrhView implements ChangeListener {
         tabs = trh.getTabsArray();
 
         loadComboBox(transAidComboBox  , aids );
-        loadComboBox(transFidComboBox  , fids );
+        loadComboBox(transFidComboBox, fids);
         loadComboBox(firmComboBox      , fids );
-        loadComboBox(comoComboBox      , tabs );
+        loadComboBox(comoComboBox, tabs);
         loadComboBox(transComoComboBox , tabs );
 
         StringBuilder sb = new StringBuilder();

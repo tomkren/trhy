@@ -2,7 +2,7 @@ package cz.tomkren.trhy;
 
 import java.util.*;
 
-public class MyUtils {
+public class Utils {
 
     public static final double EPSILON = 0.000000001;    // todo ještě líp udělat pomocí relativního epsilon..
     public static boolean isAlmostTheSame(double a, double b) {

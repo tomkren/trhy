@@ -16,7 +16,7 @@ public class FirmView implements ChangeListener {
 
     public FirmView(Firm f) {
         firm = f;
-        Utils.mkFrameAndRegister(firm.getFirmID(), panel, firm.getChangeInformer(), this);
+        ViewUtils.mkFrameAndRegister(firm.getFirmID(), panel, firm.getChangeInformer(), this);
         draw();
     }
 
