@@ -112,6 +112,11 @@ public class Tabule {
         if (req instanceof Trans.Buy) { ret =  addBuy(new  BuyOpts((Trans.Buy) req, transID, currentTik)); }
         if (req instanceof Trans.Sell){ ret = addSell(new SellOpts((Trans.Sell)req, transID, currentTik)); }
 
+        if (ret.isEmpty()) {
+            // TODO nastává pro množství menší než epsilon
+            throw new Error("Prázdný ret v Tabule.add !!!");
+        }
+
         changeInformer.informListeners();
         return ret;
     }
@@ -123,7 +128,9 @@ public class Tabule {
         double myPrice = buyReq.getPrice();
         double myMoney = buyReq.getMoney();
 
-        while (myMoney > 0 && !supply.isEmpty()) {
+        int i = 0;
+
+        while (myMoney > MyUtils.EPSILON && !supply.isEmpty()) {
 
             Row supplyRow = supply.peek();
 
@@ -133,9 +140,12 @@ public class Tabule {
                 addToDemand(ret, myPrice, myMoney, buyOpts);
                 return ret;
             }
+
+            i++;
+            if (i > 10000) {throw new Error("Stuck in while in Tabule.addBuy() !!!");}
         }
 
-        if (myMoney > 0) {
+        if (myMoney > MyUtils.EPSILON) {
             if (buyReq.isQuick()) {
                 addBuyFailResult(ret, myMoney, buyOpts);
             } else {
@@ -153,7 +163,8 @@ public class Tabule {
         double myPrice = sellReq.getPrice();
         double myNum   = sellReq.getNum();
 
-        while (myNum > 0 && !demand.isEmpty()) {
+        int i = 0;
+        while (myNum > MyUtils.EPSILON && !demand.isEmpty()) {
 
             Row demandRow = demand.peek();
 
@@ -163,9 +174,12 @@ public class Tabule {
                 addToSupply(ret, myPrice, myNum, sellOpts);
                 return ret;
             }
+
+            i++;
+            if (i > 10000) {throw new Error("Stuck in while in Tabule.addSell() !!!");}
         }
 
-        if (myNum > 0) {
+        if (myNum > MyUtils.EPSILON) {
             if (sellReq.isQuick()) {
                 addSellFailResult(ret, myNum, sellOpts);
             } else {

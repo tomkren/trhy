@@ -19,6 +19,7 @@ public class TrhTester {
         this(t, null);
     }
 
+    // TODO pro 1000 dělá divnosti, prozkoumat proč
     public boolean sendRandomTrans(int n) {
         for (int i = 0; i < n; i++) {
             boolean isOK = sendRandomTrans();
@@ -97,7 +98,6 @@ public class TrhTester {
     public static final double P_OF_DUMP_PRICE = 0.1;
 
 
-    //TODO bug viz níže
 
     private double getRandPrice(String comoName, boolean isBuy) {
         PriceInfo pi = trh.getTabule(comoName).getPriceInfo();

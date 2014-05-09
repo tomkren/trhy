@@ -12,7 +12,7 @@ import java.util.*;
 public class Firm {
     
     private String firmID;
-    private Map<String,Elem> inventory;
+    private Map<String,Stuff> inventory;
 
     private double money; // protože se do nich šahá opravdu často,
                           // nedáme je pro efektivitu do mapy 
@@ -21,7 +21,7 @@ public class Firm {
 
     public Firm (String firmID) {
         this.firmID = firmID;
-        inventory = new HashMap<String, Elem>();
+        inventory = new HashMap<>();
         money = 0;
         changeInformer = new ChangeInformer();
     }
@@ -32,7 +32,7 @@ public class Firm {
             if (it.getCommodity().toString().equals("$")) {
                 money += it.getNum();
             } else {
-                inventory.put(it.getCommodity().getName(),new NumElem(it.getCommodity(),it.getNum()));
+                inventory.put(it.getCommodity().getName(),new Stuff.Basic(it.getCommodity(),it.getNum()));
             }
         }
     }
@@ -46,9 +46,9 @@ public class Firm {
         StringBuilder sb = new StringBuilder("=== "+firmID+" ===\n");
         sb.append("$ ... ").append(money).append("\n");
 
-        for (Map.Entry<String, Elem> entry : inventory.entrySet()) {
+        for (Map.Entry<String, Stuff> entry : inventory.entrySet()) {
             String key = entry.getKey();
-            Elem value = entry.getValue();
+            Stuff value = entry.getValue();
 
             sb.append(key).append(" ... ").append(value.getNum()).append("\n");
         }
@@ -67,7 +67,7 @@ public class Firm {
     }
     
     public boolean hasEnoughCommodity(String comoName, double num) {
-        Elem e = inventory.get(comoName);
+        Stuff e = inventory.get(comoName);
         return e != null && e.getNum() >= num;
     }
     
@@ -79,9 +79,9 @@ public class Firm {
     
     public double addCommodity (Commodity c, double delta) {
         double ret; // kolik je komodity po přidání
-        Elem e = inventory.get(c.getName());
+        Stuff e = inventory.get(c.getName());
         if (e == null) {
-            inventory.put(c.getName(), new NumElem(c,delta));
+            inventory.put(c.getName(), new Stuff.Basic(c,delta));
             ret = delta;
         } else {
             ret = e.addNum(delta);
@@ -94,7 +94,7 @@ public class Firm {
         return firmID;
     }
     
-    public Map<String,Elem> getInventoryMap () {
+    public Map<String,Stuff> getInventoryMap () {
         return inventory;
     }
 
@@ -103,11 +103,12 @@ public class Firm {
     }
 
     public double getComoNum (String comoName) {
-        Elem e = inventory.get(comoName);
+        Stuff e = inventory.get(comoName);
         if (e == null) {return 0;}
         return e.getNum();
     }
-    
+
+    /*
     public static interface Elem {
         public Commodity getCommodity();
         public double getNum();
@@ -137,6 +138,7 @@ public class Firm {
             return num;
         } 
     }
+    */
 
     public static class Examples {
         public static Firm mkKolonialKatz() {

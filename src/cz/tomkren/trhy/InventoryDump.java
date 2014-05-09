@@ -2,6 +2,7 @@ package cz.tomkren.trhy;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class InventoryDump {
 
@@ -12,7 +13,7 @@ public class InventoryDump {
     }
 
     public InventoryDump () {
-        dump = new HashMap<String, Double>();
+        dump = new HashMap<>();
     }
 
     public InventoryDump (Collection<? extends Dumpable> xs) {
@@ -31,29 +32,19 @@ public class InventoryDump {
     }
 
     public List<String> getComoNames(boolean includeMoney) {
-        List<String> ret = new ArrayList<String>();
-        for (String cName: dump.keySet()) {
-            if (includeMoney || !cName.equals("$")) {
-                ret.add(cName);
-            }
-        }
-        return ret;
+        return dump.keySet().stream()
+                            .filter(cName -> includeMoney || !cName.equals("$"))
+                            .collect(Collectors.toList());
     }
 
-    // todo pokusit se decouplenout
+    // todo pokusit se o decouple
     public InventoryDump (Firm firm) {
         this();
 
         dump.put("$", firm.getMoney() );
 
-        for (Map.Entry<String, Firm.Elem> entry : firm.getInventoryMap().entrySet()) {
-            String key = entry.getKey();
-            Firm.Elem elem = entry.getValue();
-
-            if (elem instanceof Firm.NumElem) {
-                Firm.NumElem numElem = (Firm.NumElem) elem;
-                dump.put(key, numElem.getNum());
-            }
+        for (Map.Entry<String, Stuff> entry : firm.getInventoryMap().entrySet()) {
+            dump.put(entry.getKey(), entry.getValue().getNum());
         }
     }
     
@@ -82,10 +73,6 @@ public class InventoryDump {
     }
 
 
-    public static final double EPSILON = 0.000000001;    // todo ještě líp udělat pomocí relativního epsilon..
-    public static boolean isAlmostTheSame(double a, double b) {
-        return a == b || Math.abs(a-b) < EPSILON;
-    }
 
     public boolean porovnej(InventoryDump invDump2, boolean isSilent) {
 
@@ -99,7 +86,7 @@ public class InventoryDump {
         for (Map.Entry<String,Double> entry: dump.entrySet()) {
             double val1 = entry.getValue();
             double val2 = dump2.get(entry.getKey());
-            if ( !isAlmostTheSame(val1, val2) ) {
+            if ( !MyUtils.isAlmostTheSame(val1, val2) ) {
                 Log.it("nemečuje množství "+entry.getKey()+" "+val1+" != "+val2, isSilent);
                 return false;
             }

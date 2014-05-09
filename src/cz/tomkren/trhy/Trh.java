@@ -229,10 +229,10 @@ public class Trh {
         firms.put(firmID, hisFirm);
 
         // projdi všechny komodity a pokud pro ně ještě není trh tak ho udělej..
-        for (Map.Entry<String, Firm.Elem> entry : hisFirm.getInventoryMap().entrySet()) {
+        for (Map.Entry<String, Stuff> entry : hisFirm.getInventoryMap().entrySet()) {
             String como = entry.getKey();
             if (!tabs.containsKey(como)) {
-                addTabule(entry.getValue().getCommodity());
+                addTabule(entry.getValue().getComo());
             }
         }
 

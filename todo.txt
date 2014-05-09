@@ -1,21 +1,33 @@
-Nejdřív asi dodělat TrhTester, abych si byl jistější v kranflekách, že to fakt fachá jak by mělo.
+TODOs
 
+-> Refactor: Tabule.addBuy/addSell sjednotit do jedné Tabule.add
+   - slo by lehčeji pokud by byli ve stejných jednotkách
+-> Zvážit zda nepředělat doubly (peníze a ks) na inty !!!!
+-> Zvážit zda nezadávat buy i sell ve stejných jednotkách (ks) a ne (ks vs. peníze)
+   - nejde pokud by se předělalo na inty!
+
+- různé druhy tabulí
+  - např:
+    - pro jen quick (aby šlo napojit na aktualní cenu akcií bez složitostí)
+    - pro fitness
+    - pro int vs. pro double operace (?)
+
+- stroje
+  - cmd do (pro nalití vstupu do stroje kerý nastartuje vyrobení výstupů)
 
 - TrhView
-   - předělat všcky viewes aby dědili od společnýho aby DRY (díky Utils.initFrame asi už OK)
-   - udělat historii (např pro firmy, tabule ... dokonce celej trh?)
+   - předělat všecky views aby dědili od společného aby DRY (díky Utils.initFrame asi už OK)
+   - udělat historii (např pro firmy, tabule ... dokonce celý trh?)
 
 - TrhTester, co má umět?
  - hlavně generovat náhodný transakce
    - jak je generovat?
      - agent třeba na transakci utratí procento (nebo klidně i víc,   pač se to vždycky počita z toho co má,
-       takže to nedojde) (střed normalně rozložený, náhodně, nebo i trapnějc) (ať už peněz nebo komodit)
+       takže to nedojde) (střed normálně rozložený, náhodně, nebo i trapnějc) (ať už peněz nebo komodit)
        a náhodně si trefí jednu z tech 4 možností. Quick jsou jasný a zbejvá slow, tzn výběr ceny a to bych vzal
        třeba z intervalu nejnižší cena - 10% do nejvyšší cena + 10% nebo tak ňák..
-     - mohli by tam bejt i řízený omgy že nekdo schválně vykoupí tabulku aby tam byly ty faily (ale asi zbytečná blbost)
- - generovat náhodný firmy s agentama
+     - mohli by tam bejt i řízený omgy že někdo schválně vykoupí tabulku aby tam byly ty faily (ale asi zbytečná blbost)
+ - generovat náhodný firmy s agenty
    - co vstup?
       - komodity, stroje
 
-- stroje
-  - cmd do (pro nalití vstupu do stroje kerý nastartuje vyrobení výstupů)

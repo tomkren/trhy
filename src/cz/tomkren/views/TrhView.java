@@ -107,7 +107,7 @@ public class TrhView implements ChangeListener {
             priceTextField.setEnabled(!isQuick);
         });
 
-        nSpinner.setValue(1);
+        nSpinner.setValue(1000);
         sendRandTransButton.addActionListener(e -> {
             int n = (Integer) nSpinner.getValue();
             Log.it("Sending "+ n +" random transactions, yeehaa!");
