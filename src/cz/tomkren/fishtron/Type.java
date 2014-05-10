@@ -4,7 +4,7 @@ package cz.tomkren.fishtron;
 public interface Type {
 
     public class Const implements Type {
-        private String sym;
+        private final String sym;
         public Const(String sym) {
             this.sym = sym;
         }
@@ -27,8 +27,8 @@ public interface Type {
     }
 
     public class Arrow implements Type {
-        private Type input;
-        private Type output;
+        private final Type input;
+        private final Type output;
         public Arrow(Type input, Type output) {
             this.input = input;
             this.output = output;
@@ -64,7 +64,7 @@ public interface Type {
     }
 
     public class Var implements Type {
-        private String sym;
+        private final String sym;
         public Var(String sym) {
             this.sym = sym;
         }

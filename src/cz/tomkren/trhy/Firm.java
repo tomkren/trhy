@@ -93,7 +93,9 @@ public class Firm {
 
         Stuff output = machine.work(input);
 
-        // todo odečíst a přičíst
+        // odebrat použité vstupy a přičíst vzniklé výstupy
+        subtractCommodity(input);
+        addCommodity(output);
 
         return WorkRes.ok(output);
     }
@@ -179,7 +181,26 @@ public class Firm {
         changeInformer.informListeners();
         return money;
     }
-    
+
+    public double addCommodity (Stuff s) {
+        if (s instanceof PluralStuff){
+            PluralStuff ps = (PluralStuff) s;
+            return addCommodity(ps.getComo(), ps.getNum());
+        }
+        // todo pro SingularStuff
+        throw new UnsupportedOperationException("todo : addCommodity(Stuff s) pro SingularStuff");
+    }
+
+    public double subtractCommodity (Stuff s) {
+        if (s instanceof PluralStuff) {
+            PluralStuff ps = (PluralStuff) s;
+            return addCommodity(ps.getComo(),-ps.getNum());
+        }
+        // todo pro SingularStuff
+        throw new UnsupportedOperationException("todo : subtractCommodity(Stuff s) pro SingularStuff");
+    }
+
+    // todo nápodobně odpublicovat
     public double addCommodity (Type c, double delta) {
         double ret; // kolik je komodity po přidání
         PluralStuff e = plInventory.get(c.toString());
