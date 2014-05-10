@@ -63,7 +63,6 @@ public interface Type {
         }
     }
 
-/* todo zatim zakomentováno aby se to nepletlo při refactoru
     public class Var implements Type {
         private String sym;
         public Var(String sym) {
@@ -86,6 +85,5 @@ public interface Type {
             return sym.hashCode();
         }
     }
-*/
 
 }
