@@ -1,5 +1,4 @@
 package cz.tomkren.trhy;
-
 import cz.tomkren.fishtron.Type;
 import cz.tomkren.observer.BasicChangeInformer;
 import cz.tomkren.observer.ChangeInformer;
@@ -7,11 +6,6 @@ import cz.tomkren.trhy.helpers.InventoryDump;
 import cz.tomkren.trhy.helpers.Log;
 
 import java.util.*;
-
-/**
- *
- * @author Tomáš Křen
- */
 
 public class Trh {
     private Map<String,Tabule>      tabs;      // komodita -> tabule tý komodity

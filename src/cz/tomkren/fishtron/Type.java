@@ -1,6 +1,5 @@
 package cz.tomkren.fishtron;
 
-
 public interface Type {
 
     public class Const implements Type {

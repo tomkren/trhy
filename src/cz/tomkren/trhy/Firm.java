@@ -1,5 +1,4 @@
 package cz.tomkren.trhy;
-
 import cz.tomkren.fishtron.Type;
 import cz.tomkren.observer.BasicChangeInformer;
 import cz.tomkren.observer.ChangeInformer;
@@ -10,10 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- *
- * @author Tomáš Křen
- */
 public class Firm {
 
     private String firmID;
