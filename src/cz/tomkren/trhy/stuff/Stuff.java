@@ -1,7 +1,5 @@
 package cz.tomkren.trhy.stuff;
 
-import cz.tomkren.trhy.Commodity;
-
 public interface Stuff {
 
     public Commodity getComo();

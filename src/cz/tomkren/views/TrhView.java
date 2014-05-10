@@ -1,6 +1,9 @@
 package cz.tomkren.views;
 import cz.tomkren.observer.ChangeListener;
 import cz.tomkren.trhy.*;
+import cz.tomkren.trhy.helpers.Log;
+import cz.tomkren.trhy.helpers.TrhTester;
+import cz.tomkren.trhy.helpers.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,7 +22,7 @@ public class TrhView implements ChangeListener {
             trh.addFirm("Penuel Katz" , Firm.Examples.mkKolonialKatz());
             trh.addFirm("Václav Rolný", Firm.Examples.mkPoleAS());
         } catch (Trh.TrhException e) {
-            Log.it("ERROR! >>> "+e.getMessage());
+            Log.it("ERROR! >>> " + e.getMessage());
         }
 
     }
@@ -76,11 +79,14 @@ public class TrhView implements ChangeListener {
 
         showAllFirmsButton   .addActionListener(e -> showAllFirms());
         showAllTablesButton  .addActionListener(e -> showAllTables());
-        showAllAllButton     .addActionListener(e -> {showAllFirms();showAllTables();});
+        showAllAllButton     .addActionListener(e -> {
+            showAllFirms();
+            showAllTables();
+        });
 
-        buyOrSellComboBox    .addActionListener(e -> buyOrSell() );
+        buyOrSellComboBox    .addActionListener(e -> buyOrSell());
         sendTransactionButton.addActionListener(e -> sendTransaction() );
-        quickOrSlowComboBox  .addActionListener(e -> quickOrSlow() );
+        quickOrSlowComboBox  .addActionListener(e -> quickOrSlow());
     }
 
     private void sendRandTrans(TrhTester trhTester) {

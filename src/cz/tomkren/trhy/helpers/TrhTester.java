@@ -1,4 +1,8 @@
-package cz.tomkren.trhy;
+package cz.tomkren.trhy.helpers;
+
+import cz.tomkren.trhy.Firm;
+import cz.tomkren.trhy.Trans;
+import cz.tomkren.trhy.Trh;
 
 import java.util.List;
 import java.util.Random;

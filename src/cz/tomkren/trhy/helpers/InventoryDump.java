@@ -1,8 +1,6 @@
-package cz.tomkren.trhy;
+package cz.tomkren.trhy.helpers;
 
 
-import cz.tomkren.trhy.stuff.PluralStuff;
-import cz.tomkren.trhy.stuff.SingularStuff;
 import cz.tomkren.trhy.stuff.Stuff;
 
 import java.util.Collection;

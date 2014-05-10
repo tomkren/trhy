@@ -1,7 +1,7 @@
 package cz.tomkren.views;
 
 import cz.tomkren.observer.*;
-import cz.tomkren.trhy.Log;
+import cz.tomkren.trhy.helpers.Log;
 
 import javax.swing.*;
 import java.awt.*;

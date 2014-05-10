@@ -1,4 +1,4 @@
-package cz.tomkren.trhy;
+package cz.tomkren.trhy.helpers;
 
 
 public class PriceInfo {

@@ -1,4 +1,4 @@
-package cz.tomkren.trhy;
+package cz.tomkren.trhy.helpers;
 
 import javax.swing.*;
 import java.util.*;

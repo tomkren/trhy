@@ -1,4 +1,4 @@
-package cz.tomkren.trhy;
+package cz.tomkren.trhy.stuff;
 
 public abstract class Commodity {
 

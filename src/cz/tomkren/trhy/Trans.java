@@ -1,6 +1,8 @@
 package cz.tomkren.trhy;
 
 
+import cz.tomkren.trhy.stuff.Commodity;
+
 public class Trans {
 
     public static Req mkSlowBuy   (String aid, String fid, String c, double money, double price) { return new  Buy(aid, fid, c, price, money); }

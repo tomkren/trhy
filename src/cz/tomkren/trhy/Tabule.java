@@ -1,10 +1,11 @@
 package cz.tomkren.trhy;
 
-import cz.tomkren.observer.BasicChangeInformer;
-import cz.tomkren.observer.ChangeInformer;
+import cz.tomkren.observer.*;
+import cz.tomkren.trhy.helpers.*;
+import cz.tomkren.trhy.stuff.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
 public class Tabule {
     

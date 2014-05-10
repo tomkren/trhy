@@ -1,7 +1,5 @@
 package cz.tomkren.trhy.stuff;
 
-import cz.tomkren.trhy.Commodity;
-
 public class Quantum implements PluralStuff {
     private Commodity como;
     private double    num;

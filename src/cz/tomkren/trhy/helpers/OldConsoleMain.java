@@ -1,6 +1,10 @@
-package cz.tomkren.trhy;
+package cz.tomkren.trhy.helpers;
 
-public class Main {
+import cz.tomkren.trhy.Firm;
+import cz.tomkren.trhy.Trans;
+import cz.tomkren.trhy.Trh;
+
+public class OldConsoleMain {
 
     public static void main(String[] args) {
         Log.it("MARKETS!\n");
@@ -16,7 +20,7 @@ public class Main {
             Log.it(trh);
             InventoryDump trhInvDump1 = trh.getInventoryDump();
 
-            trh.send(Trans.mkSlowBuy( "Penuel Katz",  "Koloniál Katz", "Flour", 1000, 10));
+            trh.send(Trans.mkSlowBuy("Penuel Katz", "Koloniál Katz", "Flour", 1000, 10));
             trh.send(Trans.mkSlowSell("Václav Rolný", "Pole a.s.",     "Flour", 200, 12));
             trh.send(Trans.mkQuickBuy("Penuel Katz",  "Koloniál Katz", "Flour", 24));
 

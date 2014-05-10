@@ -2,7 +2,9 @@ package cz.tomkren.trhy;
 
 import cz.tomkren.observer.BasicChangeInformer;
 import cz.tomkren.observer.ChangeInformer;
-import cz.tomkren.trhy.stuff.Stuff;
+import cz.tomkren.trhy.helpers.Log;
+import cz.tomkren.trhy.stuff.Commodity;
+import cz.tomkren.trhy.helpers.InventoryDump;
 
 import java.util.*;
 
@@ -170,7 +172,7 @@ public class Trh {
 
     private void log(Object o){
         if (!isSilent) {
-            Log.it("<TRH-LOG>        "+o);
+            Log.it("<TRH-LOG>        " + o);
         }
         log.add(o.toString());
     }

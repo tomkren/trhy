@@ -2,6 +2,8 @@ package cz.tomkren.trhy;
 
 import cz.tomkren.observer.BasicChangeInformer;
 import cz.tomkren.observer.ChangeInformer;
+import cz.tomkren.trhy.stuff.Commodity;
+import cz.tomkren.trhy.helpers.InventoryDump;
 import cz.tomkren.trhy.stuff.*;
 
 import java.util.*;

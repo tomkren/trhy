@@ -1,7 +1,5 @@
 package cz.tomkren.trhy.stuff;
 
-import cz.tomkren.trhy.Commodity;
-
 public class PluralStuffFail implements PluralStuff {
     private String msg;
 
