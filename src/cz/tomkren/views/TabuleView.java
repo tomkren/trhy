@@ -4,6 +4,7 @@ import cz.tomkren.observer.ChangeListener;
 import cz.tomkren.trhy.Tabule;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class TabuleView implements ChangeListener {
     private Tabule tabule;
@@ -13,9 +14,11 @@ public class TabuleView implements ChangeListener {
     private JLabel comoNameLabel;
     private JLabel priceInfoLabel;
 
+    private static FramePosouvac posouvac = new FramePosouvac(TrhView.WIDTH_HAX,461, 220);
+
     public TabuleView(Tabule t) {
         tabule = t;
-        ViewUtils.mkFrameAndRegister(tabule.getComoName() + " market table", panel, tabule.getChangeInformer(), this);
+        ViewUtils.mkFrameAndRegister(tabule.getComoName() + " table", panel, tabule.getChangeInformer(), this, posouvac.nextFramePos() );
         draw();
     }
 

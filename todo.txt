@@ -1,12 +1,18 @@
 TODOs
-
--> Vyřešit jak to udělat s machineID, nedělitelnými komoditami (jakože jejich počty musej bejt v intech) (což stroje určitě jsou)
-
--> Refactor: Tabule.addBuy/addSell sjednotit do jedné Tabule.add
-   - slo by lehčeji pokud by byli ve stejných jednotkách
--> Zvážit zda nepředělat doubly (peníze a ks) na inty !!!!
--> Zvážit zda nezadávat buy i sell ve stejných jednotkách (ks) a ne (ks vs. peníze)
-   - nejde pokud by se předělalo na inty!
+|
+|-> Vyřešit jak to udělat s machineID, nedělitelnými komoditami (jakože jejich počty musej bejt v intech) (což stroje určitě jsou)
+|
+|-> Refactor: Tabule.addBuy/addSell sjednotit do jedné Tabule.add
+|   - slo by lehčeji pokud by byli ve stejných jednotkách
+|
+|-> Zvážit zda nepředělat doubly (peníze a ks) na inty !!!!
+|
+|-> Zvážit zda nezadávat buy i sell ve stejných jednotkách (ks) a ne (ks vs. peníze)
+|   - nejde pokud by se předělalo na inty!
+|
+\-> Až bude hotovej work request tak sjednotit styl s transaction requestem, vzít lepší z obou přístupů a udělat to ekvivalentní.
+   - u doWorku mi de o to skusit používat třídy jako Stuff už přišlý z trhu, aby se zbytečně neoperovalo
+     v primitivních typech (String a double hlavně)
 
 - různé druhy tabulí
   - např:

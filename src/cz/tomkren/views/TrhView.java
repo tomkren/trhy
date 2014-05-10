@@ -1,123 +1,97 @@
 package cz.tomkren.views;
-
 import cz.tomkren.observer.ChangeListener;
 import cz.tomkren.trhy.*;
 
 import javax.swing.*;
-
+import java.awt.*;
 
 public class TrhView implements ChangeListener {
 
+    public static void main(String[] args) {
+
+        ViewUtils.setLookAndFeel();
+
+        Trh trh = new Trh();
+        new TrhView(trh);
+        trh.setIsSilent(true);
+
+        try {
+            trh.addFirm("Penuel Katz" , Firm.Examples.mkKolonialKatz());
+            trh.addFirm("Václav Rolný", Firm.Examples.mkPoleAS());
+        } catch (Trh.TrhException e) {
+            Log.it("ERROR! >>> "+e.getMessage());
+        }
+
+    }
+
+    public static final Point FRAME_POS = new Point(0,0);
+    public static final int   WIDTH_HAX = 950;
+
     private Trh trh;
     private boolean autoUpdate;
-
 
     private JLabel tikLabel;
     private JPanel panel;
 
     private JComboBox<String> firmComboBox;
     private JComboBox<String> comoComboBox;
-    private JButton   showFirmButton;
-    private JButton   showTabuleButton;
-    private JButton   showAllFirmsButton;
-    private JButton   showAllTablesButton;
+    private JButton           showFirmButton;
+    private JButton           showTabuleButton;
+    private JButton           showAllFirmsButton;
+    private JButton           showAllTablesButton;
 
     private JTextArea logTextArea;
 
     private JComboBox<String> transFidComboBox;
-    private JComboBox  buyOrSellComboBox;
-    private JComboBox  quickOrSlowComboBox;
     private JComboBox<String> transComoComboBox;
-    private JTextField priceTextField;
-    private JTextField transRestTextField;
-    private JButton sendTransactionButton;
-    private JLabel transRestLabel;
     private JComboBox<String> transAidComboBox;
-    private JButton sendRandTransButton;
-    private JSpinner nSpinner;
-    private JCheckBox includeMachinesCheckBox;
+    private JComboBox         buyOrSellComboBox;
+    private JComboBox         quickOrSlowComboBox;
+    private JTextField        priceTextField;
+    private JTextField        transRestTextField;
+    private JButton           sendTransactionButton;
+    private JLabel            transRestLabel;
+    private JButton           sendRandTransButton;
+    private JSpinner          nSpinner;
+    private JCheckBox         includeMachinesCheckBox;
+    private JButton showAllAllButton;
+    private JButton EXITButton;
 
 
     public TrhView(Trh t) {
         trh = t;
         autoUpdate = true;
-        final TrhTester trhTester = new TrhTester(t);
-        ViewUtils.mkFrameAndRegister("TrhView", panel, trh.getChangeInformer(), this);
+        ViewUtils.mkFrameAndRegister("Market", panel, trh.getChangeInformer(), this, FRAME_POS);
+
         draw();
 
-        showFirmButton.addActionListener(e -> {
-            String fid = (String) firmComboBox.getSelectedItem();
-            new FirmView( trh.getFirm(fid) );
-        });
-
-        showTabuleButton.addActionListener(e -> {
-            String comoName = (String) comoComboBox.getSelectedItem();
-            new TabuleView( trh.getTabule(comoName) );
-        });
-
-        showAllFirmsButton.addActionListener(e -> {
-            for (String fid : trh.getFIDsArray()) {
-                new FirmView( trh.getFirm(fid) );
-            }
-        });
-
-        showAllTablesButton.addActionListener(e -> {
-            for (String comoName : trh.getTabsArray()) {
-                new TabuleView( trh.getTabule(comoName) );
-            }
-        });
-
-        sendTransactionButton.addActionListener(e -> {
-            String aid = (String) transAidComboBox.getSelectedItem();
-            String fid = (String) transFidComboBox.getSelectedItem();
-            String comoName = (String) transComoComboBox.getSelectedItem();
-            boolean isBuy = "BUY".equals(buyOrSellComboBox.getSelectedItem());
-            boolean isQuick = "QUICK".equals(quickOrSlowComboBox.getSelectedItem());
-            double rest, price;
-            try {
-                rest = Double.parseDouble(transRestTextField.getText());
-            } catch (NumberFormatException ex) {
-                rest = 0;
-            }
-            try {
-                price = Double.parseDouble(priceTextField.getText());
-            } catch (NumberFormatException ex) {
-                price = 0;
-            }
-
-            Log.it("<" + aid + "> via <" + fid + "> " + (isQuick ? "QUICK" : "SLOW") + " " + (isBuy ? "BUY" : "SELL") +
-                    " <" + comoName + "> " + (isBuy ? "#$" : "#") + ": " + rest + " $: " + (isQuick ? "AUTO" : price));
-
-            Trans.Req req = isBuy ? (isQuick ? Trans.mkQuickBuy(aid, fid, comoName, rest)
-                    : Trans.mkSlowBuy(aid, fid, comoName, rest, price))
-                    : (isQuick ? Trans.mkQuickSell(aid, fid, comoName, rest)
-                    : Trans.mkSlowSell(aid, fid, comoName, rest, price));
-
-            trh.send(req);
-        });
-
-        buyOrSellComboBox.addActionListener(e -> {
-            boolean isBuy = "BUY".equals(buyOrSellComboBox.getSelectedItem());
-            transRestLabel.setText( isBuy ? "#$:" : "#:" );
-        });
-
-        quickOrSlowComboBox.addActionListener(e -> {
-            boolean isQuick = "QUICK".equals(quickOrSlowComboBox.getSelectedItem());
-            priceTextField.setEnabled(!isQuick);
-        });
-
+        final TrhTester trhTester = new TrhTester(t);
+        sendRandTransButton.addActionListener(e -> sendRandTrans(trhTester));
         nSpinner.setValue(1000);
-        sendRandTransButton.addActionListener(e -> {
 
-            int n = (Integer) nSpinner.getValue();
-            boolean includeMachines = includeMachinesCheckBox.isSelected();
+        EXITButton.addActionListener(e -> System.exit(0));
 
-            //Log.it("Sending "+ n +" random transactions, yeehaa!");
+        showFirmButton       .addActionListener(e -> showFirm());
+        showTabuleButton     .addActionListener(e -> showTabule());
 
-            doWithoutRedrawsThenRedraw(()->{
-                boolean testResult = trhTester.sendRandomTrans(n,includeMachines);
-                Log.it("Send "+n+" rand trans test result: "+(testResult?"OK":"KO!!!!!!!!!!!!!!!!"));
-            });
+        showAllFirmsButton   .addActionListener(e -> showAllFirms());
+        showAllTablesButton  .addActionListener(e -> showAllTables());
+        showAllAllButton     .addActionListener(e -> {showAllFirms();showAllTables();});
+
+        buyOrSellComboBox    .addActionListener(e -> buyOrSell() );
+        sendTransactionButton.addActionListener(e -> sendTransaction() );
+        quickOrSlowComboBox  .addActionListener(e -> quickOrSlow() );
+    }
+
+    private void sendRandTrans(TrhTester trhTester) {
+        int n = (Integer) nSpinner.getValue();
+        boolean includeMachines = includeMachinesCheckBox.isSelected();
+
+        //Log.it("Sending "+ n +" random transactions, yeehaa!");
+
+        doWithoutRedrawsThenRedraw(()->{
+            boolean testResult = trhTester.sendRandomTrans(n,includeMachines);
+            Log.it("Send " + n + " rand trans test result: " + (testResult ? "OK" : "KO!!!!!!!!!!!!!!!!"));
         });
     }
 
@@ -128,6 +102,12 @@ public class TrhView implements ChangeListener {
         draw();
     }
 
+    @Override
+    public void onChange() {
+        if (autoUpdate) {
+            draw();
+        }
+    }
 
     private void draw() {
         tikLabel.setText( Integer.toString(trh.getTik()) );
@@ -159,55 +139,76 @@ public class TrhView implements ChangeListener {
         this.autoUpdate = autoUpdate;
     }
 
-    @Override
-    public void onChange() {
-        if (autoUpdate) {
-            draw();
-        }
+
+
+    // ----  button metody -----------------------------------------------------------------------------------------------
+
+    private void quickOrSlow() {
+        boolean isQuick = "QUICK".equals(quickOrSlowComboBox.getSelectedItem());
+        priceTextField.setEnabled(!isQuick);
     }
 
-    private static final boolean USE_SYSTEM_LOOK_AND_FEEL = false;
-    private static final boolean USE_NIMBUS_LOOK_AND_FEEL = true;
-
-    private static void setLookAndFeel () {
-        if (USE_SYSTEM_LOOK_AND_FEEL) {
-            try {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } catch (Exception e) {
-                Log.it("Unable to set native look and feel, sorry.");
-            }
-        }
-
-        if (USE_NIMBUS_LOOK_AND_FEEL) {
-            try {
-                for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                    if ("Nimbus".equals(info.getName())) {
-                        UIManager.setLookAndFeel(info.getClassName());
-                        break;
-                    }
-                }
-            } catch (Exception e) {
-                Log.it("Unable to set Nimbus look and feel, sorry.");
-            }
-        }
+    private void buyOrSell() {
+        boolean isBuy = "BUY".equals(buyOrSellComboBox.getSelectedItem());
+        transRestLabel.setText( isBuy ? "#$:" : "#:" );
     }
 
-    public static void main(String[] args) {
-
-        setLookAndFeel();
-
-        Trh trh = new Trh();
-        new TrhView(trh);
-        trh.setIsSilent(true);
-
+    private void sendTransaction() {
+        String aid = (String) transAidComboBox.getSelectedItem();
+        String fid = (String) transFidComboBox.getSelectedItem();
+        String comoName = (String) transComoComboBox.getSelectedItem();
+        boolean isBuy = "BUY".equals(buyOrSellComboBox.getSelectedItem());
+        boolean isQuick = "QUICK".equals(quickOrSlowComboBox.getSelectedItem());
+        double rest, price;
         try {
-            trh.addFirm("Penuel Katz" , Firm.Examples.mkKolonialKatz());
-            trh.addFirm("Václav Rolný", Firm.Examples.mkPoleAS());
-        } catch (Trh.TrhException e) {
-            Log.it("ERROR! >>> "+e.getMessage());
+            rest = Double.parseDouble(transRestTextField.getText());
+        } catch (NumberFormatException ex) {
+            rest = 0;
+        }
+        try {
+            price = Double.parseDouble(priceTextField.getText());
+        } catch (NumberFormatException ex) {
+            price = 0;
         }
 
+        Log.it("<" + aid + "> via <" + fid + "> " + (isQuick ? "QUICK" : "SLOW") + " " + (isBuy ? "BUY" : "SELL") +
+                " <" + comoName + "> " + (isBuy ? "#$" : "#") + ": " + rest + " $: " + (isQuick ? "AUTO" : price));
+
+        Trans.Req req = isBuy ? (isQuick ? Trans.mkQuickBuy(aid, fid, comoName, rest)
+                : Trans.mkSlowBuy(aid, fid, comoName, rest, price))
+                : (isQuick ? Trans.mkQuickSell(aid, fid, comoName, rest)
+                : Trans.mkSlowSell(aid, fid, comoName, rest, price));
+
+        trh.send(req);
     }
+
+    private void showFirm() {
+        String fid = (String) firmComboBox.getSelectedItem();
+        new FirmView( trh.getFirm(fid) );
+    }
+
+    private void showTabule() {
+        String comoName = (String) comoComboBox.getSelectedItem();
+        new TabuleView( trh.getTabule(comoName) );
+    }
+
+    private void showAllFirms() {
+        for (String fid : trh.getFIDsArray()) {
+            new FirmView( trh.getFirm(fid) );
+        }
+    }
+
+    private void showAllTables() {
+        for (String comoName : trh.getTabsArray()) {
+            new TabuleView( trh.getTabule(comoName) );
+        }
+    }
+
+
+
+
+
+
 
 
 }
