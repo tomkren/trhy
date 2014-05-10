@@ -1,5 +1,7 @@
 package cz.tomkren.trhy.stuff;
 
+import cz.tomkren.fishtron.Type;
+
 public class PluralStuffFail implements PluralStuff {
     private String msg;
 
@@ -7,7 +9,7 @@ public class PluralStuffFail implements PluralStuff {
         this.msg = msg;
     }
     @Override
-    public Commodity getComo() {
+    public Type getComo() {
         return null;
     }
     public String getMsg() {

@@ -1,12 +1,13 @@
 package cz.tomkren.trhy;
 
+import cz.tomkren.fishtron.Type;
 import cz.tomkren.observer.BasicChangeInformer;
 import cz.tomkren.observer.ChangeInformer;
-import cz.tomkren.trhy.stuff.Commodity;
 import cz.tomkren.trhy.helpers.InventoryDump;
 import cz.tomkren.trhy.stuff.*;
-
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -130,14 +131,14 @@ public class Firm {
         return dump;
     }
 
-    public List<Commodity> getComos () {
-        List<Commodity> ret;
+    public List<Type> getComos () {
+        List<Type> ret;
         ret =       getComos(plInventory)  ;
         ret.addAll(getComos(sgInventory));
         return ret;
     }
 
-    private List<Commodity> getComos (Map<String,? extends Stuff> inventory) {
+    private List<Type> getComos (Map<String,? extends Stuff> inventory) {
         return inventory.values().stream().map(Stuff::getComo).collect(Collectors.toList());
     }
 
@@ -179,11 +180,11 @@ public class Firm {
         return money;
     }
     
-    public double addCommodity (Commodity c, double delta) {
+    public double addCommodity (Type c, double delta) {
         double ret; // kolik je komodity po přidání
-        PluralStuff e = plInventory.get(c.getName());
+        PluralStuff e = plInventory.get(c.toString());
         if (e == null) {
-            plInventory.put(c.getName(), new Quantum(c, delta));
+            plInventory.put(c.toString(), new Quantum(c, delta));
             ret = delta;
         } else {
             ret = e.addNum(delta);

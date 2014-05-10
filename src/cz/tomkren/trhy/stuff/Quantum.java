@@ -1,14 +1,16 @@
 package cz.tomkren.trhy.stuff;
 
-public class Quantum implements PluralStuff {
-    private Commodity como;
-    private double    num;
+import cz.tomkren.fishtron.Type;
 
-    public Quantum(Commodity como, double num) {
+public class Quantum implements PluralStuff {
+    private Type   como;
+    private double num;
+
+    public Quantum(Type como, double num) {
         this.como = como;
         this.num = num;
     }
-    public Commodity getComo() {
+    public Type getComo() {
         return como;
     }
     public double getNum() {

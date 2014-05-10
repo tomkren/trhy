@@ -33,6 +33,9 @@ public interface Type {
             this.input = input;
             this.output = output;
         }
+        public Arrow(String constSym1, String constSym2) {
+            this(new Const(constSym1), new Const(constSym2));
+        }
         public Type getInput() {
             return input;
         }
@@ -60,6 +63,7 @@ public interface Type {
         }
     }
 
+/* todo zatim zakomentováno aby se to nepletlo při refactoru
     public class Var implements Type {
         private String sym;
         public Var(String sym) {
@@ -82,5 +86,6 @@ public interface Type {
             return sym.hashCode();
         }
     }
+*/
 
 }

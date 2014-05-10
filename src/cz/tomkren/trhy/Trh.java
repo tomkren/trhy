@@ -1,10 +1,10 @@
 package cz.tomkren.trhy;
 
+import cz.tomkren.fishtron.Type;
 import cz.tomkren.observer.BasicChangeInformer;
 import cz.tomkren.observer.ChangeInformer;
-import cz.tomkren.trhy.helpers.Log;
-import cz.tomkren.trhy.stuff.Commodity;
 import cz.tomkren.trhy.helpers.InventoryDump;
+import cz.tomkren.trhy.helpers.Log;
 
 import java.util.*;
 
@@ -208,8 +208,8 @@ public class Trh {
         return numTrans ++;
     }
     
-    private void addTabule (Commodity c) {
-        tabs.put(c.getName(), new Tabule(c));
+    private void addTabule (Type c) {
+        tabs.put(c.toString(), new Tabule(c));
     }
     
     public void addFirm(String agentID, Firm hisFirm) throws TrhException {
@@ -232,7 +232,7 @@ public class Trh {
         firms.put(firmID, hisFirm);
 
         // projdi všechny komodity a pokud pro ně ještě není trh tak ho udělej..
-        hisFirm.getComos().stream().filter(c -> !tabs.containsKey(c.getName())).forEach(this::addTabule);
+        hisFirm.getComos().stream().filter( c -> !tabs.containsKey(c.toString()) ).forEach(this::addTabule);
 
         AIDs.add(agentID);
 
@@ -304,7 +304,7 @@ public class Trh {
 
         if (req instanceof Trans.Sell) {
             Trans.Sell sell = (Trans.Sell) req;
-            Commodity commodity = req.getComo();
+            Type commodity = req.getComo();
 
             double newNum = firm.addCommodity(commodity, -sell.getNum());
 

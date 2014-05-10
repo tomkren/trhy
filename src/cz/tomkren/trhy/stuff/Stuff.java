@@ -1,13 +1,15 @@
 package cz.tomkren.trhy.stuff;
 
+import cz.tomkren.fishtron.Type;
+
 public interface Stuff {
 
-    public Commodity getComo();
-    public String    dumpKey();
-    public double    dumpVal();
+    public Type    getComo();
+    public String  dumpKey();
+    public double  dumpVal();
 
     default public String getComoName() {
-        return getComo().getName();
+        return getComo().toString();
     }
 
 
@@ -16,11 +18,11 @@ public interface Stuff {
     }
 
     public static Stuff quantum(String comoName, double num) {
-        return new Quantum( new Commodity.Basic(comoName), num );
+        return new Quantum( new Type.Const(comoName), num );
     }
 
     public static Stuff simpleMachine(String machineID, String inputCName, String outputCName, double beta) {
-        return new SimpleMachine(machineID, beta, new Commodity.Basic(inputCName), new Commodity.Basic(outputCName) );
+        return new SimpleMachine(machineID, beta, new Type.Arrow(inputCName, outputCName) );
     }
 
 

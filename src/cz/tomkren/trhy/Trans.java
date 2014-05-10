@@ -1,7 +1,7 @@
 package cz.tomkren.trhy;
 
 
-import cz.tomkren.trhy.stuff.Commodity;
+import cz.tomkren.fishtron.Type;
 
 public class Trans {
 
@@ -13,16 +13,16 @@ public class Trans {
 
 
     public static class Head { // ( Agent, his firm(ID), the commodity )
-        private String   agentID;
-        private String   firmID;
-        private Commodity commodity;
+        private String agentID;
+        private String firmID;
+        private Type   commodity;
 
-        public Head(String aid, String fid, Commodity c) {
+        public Head(String aid, String fid, Type c) {
             agentID = aid; firmID = fid; commodity = c;
         }
         public String   getAID () {return agentID;}
         public String   getFID () {return firmID;}
-        public Commodity getComo() {return commodity;}
+        public Type     getComo() {return commodity;}
         @Override
         public String toString() {
             return agentID + " " + firmID + " " + commodity.toString();
@@ -33,14 +33,14 @@ public class Trans {
         private Head   head;
         private double price;
 
-        public Head      getHead()     {return head;}
-        public String    getAID ()     {return head.getAID();}
-        public String    getFID ()     {return head.getFID();}
-        public Commodity getComo()     {return head.getComo();}
-        public String    getComoName() {return head.getComo().getName();}
-        public double    getPrice()    {return price;}
+        public Head   getHead     () {return head;}
+        public String getAID      () {return head.getAID();}
+        public String getFID      () {return head.getFID();}
+        public Type   getComo     () {return head.getComo();}
+        public String getComoName () {return head.getComo().toString();}
+        public double getPrice    () {return price;}
         public Req (String aid, String fid, String cName, double p) {
-            head = new Head(aid, fid, new Commodity.Basic(cName));
+            head = new Head(aid, fid, new Type.Const(cName) );
             price = p;
         }
 
@@ -129,8 +129,8 @@ public class Trans {
         public EffectType getEffectType() {return resEffect.getType();}
         public double getEffectVal()      {return resEffect.getVal(); }
 
-        public String    getFID()  {return head.getFID(); }
-        public Commodity getComo() {return head.getComo();}
+        public String getFID()  {return head.getFID(); }
+        public Type   getComo() {return head.getComo();}
 
         private ResEffect getResEffect () {
             switch (status) {

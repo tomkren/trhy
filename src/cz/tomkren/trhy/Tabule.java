@@ -1,15 +1,19 @@
 package cz.tomkren.trhy;
 
-import cz.tomkren.observer.*;
-import cz.tomkren.trhy.helpers.*;
-import cz.tomkren.trhy.stuff.*;
+import cz.tomkren.fishtron.Type;
+import cz.tomkren.observer.BasicChangeInformer;
+import cz.tomkren.observer.ChangeInformer;
+import cz.tomkren.trhy.helpers.InventoryDump;
+import cz.tomkren.trhy.helpers.Log;
+import cz.tomkren.trhy.helpers.PriceInfo;
+import cz.tomkren.trhy.helpers.Utils;
 
 import java.util.*;
-import java.util.stream.*;
+import java.util.stream.Collectors;
 
 public class Tabule {
     
-    private Commodity commodity;
+    private Type commodity;
 
     private PriorityQueue<Row> supply;
     private PriorityQueue<Row> demand;
@@ -57,7 +61,7 @@ public class Tabule {
         }
 
         public String dumpKey() {
-            return isSupply() ? commodity.getName() : "$";
+            return isSupply() ? commodity.toString() : "$";
         }
 
         public Double dumpVal() {
@@ -71,7 +75,7 @@ public class Tabule {
         demand.add(new Row(RowType.DEMAND,transID, agentID, firmID, price, num, tik));
     }
 
-    public Tabule(Commodity commodity) {
+    public Tabule(Type commodity) {
         this.commodity = commodity;
         int initialCapacity = 11; //11 je prej default
         supply = new PriorityQueue<>(initialCapacity, new MinRowComparator());
@@ -84,7 +88,7 @@ public class Tabule {
     }
 
     public String getComoName() {
-        return commodity.getName();
+        return commodity.toString();
     }
 
 
@@ -312,7 +316,7 @@ public class Tabule {
     public static void main (String[] args) {
         Log.it("Tabule main, hello!");
         
-        Commodity pie = new Commodity.Basic("Koláč");
+        Type pie = new Type.Const("Koláč");
 
         Tabule t = new Tabule(pie);
 
