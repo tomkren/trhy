@@ -4,12 +4,7 @@ import cz.tomkren.observer.BasicChangeInformer;
 import cz.tomkren.observer.ChangeInformer;
 
 import java.util.*;
-
-/**
- *
- * @author Tomáš Křen
- */
-
+import java.util.stream.Collectors;
 
 public class Tabule {
     
@@ -22,7 +17,7 @@ public class Tabule {
 
     public static enum RowType {SUPPLY, DEMAND}
 
-    private class Row implements InventoryDump.Dumpable {
+    private class Row {
         
         private int     transID;   // transaction ID
         private String  agentID;   // agent ID, abych věděl koho informovat
@@ -56,12 +51,16 @@ public class Tabule {
             return "$"+price+" ... "+num+" ks ... "+getFID()+" ("+getAID()+") [tid "+getTID()+" tik "+ tik +"]";
         }
 
-        @Override
-        public Map.Entry<String, Double> dump() {
-            boolean isSupply = rowType == RowType.SUPPLY ;
-            String key = isSupply ? commodity.getName() : "$"       ;
-            Double val = isSupply ? getNum()            : getValue();
-            return new AbstractMap.SimpleImmutableEntry<>(key, val);
+        public boolean isSupply() {
+            return rowType == RowType.SUPPLY;
+        }
+
+        public String dumpKey() {
+            return isSupply() ? commodity.getName() : "$";
+        }
+
+        public Double dumpVal() {
+            return isSupply() ? getNum() : getValue();
         }
     }
     private void addSupplyRow (int transID, String agentID, String firmID, double price, double num, int tik) {
@@ -299,13 +298,14 @@ public class Tabule {
 
 
     public InventoryDump getInventoryDump() {
-        Collection<? extends InventoryDump.Dumpable> supplyCol = supply;
-        Collection<? extends InventoryDump.Dumpable> demandCol = demand;
-
-        InventoryDump ret = new InventoryDump(supplyCol);
-        ret.add(new InventoryDump(demandCol));
-
+        InventoryDump ret;
+        ret =    new InventoryDump(getQueueDump(supply))  ;
+        ret.add( new InventoryDump(getQueueDump(demand)) );
         return ret;
+    }
+
+    private Map<String,Double> getQueueDump(PriorityQueue<Row> q) {
+        return q.stream().collect( Collectors.toMap(Row::dumpKey, Row::dumpVal, (x,y)->x+y) );
     }
     
     public static void main (String[] args) {

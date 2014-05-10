@@ -114,12 +114,10 @@ public class TrhView implements ChangeListener {
 
             //Log.it("Sending "+ n +" random transactions, yeehaa!");
 
-            //setAutoUpdate(false);
-            //trhTester.sendRandomTrans(n,includeMachines);
-            //setAutoUpdate(true);
-            //draw();
-
-            doWithoutRedrawsThenRedraw(()->trhTester.sendRandomTrans(n,includeMachines));
+            doWithoutRedrawsThenRedraw(()->{
+                boolean testResult = trhTester.sendRandomTrans(n,includeMachines);
+                Log.it("Send "+n+" rand trans test result: "+(testResult?"OK":"KO!!!!!!!!!!!!!!!!"));
+            });
         });
     }
 

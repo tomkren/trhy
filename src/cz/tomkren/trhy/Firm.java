@@ -2,8 +2,10 @@ package cz.tomkren.trhy;
 
 import cz.tomkren.observer.BasicChangeInformer;
 import cz.tomkren.observer.ChangeInformer;
+import cz.tomkren.trhy.stuff.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -17,9 +19,9 @@ public class Firm {
                     "Koloniál Katz", //Penuel Katz
                     new Stuff[]{
                             Stuff.money(100000),
-                            Stuff.basic("Work",5),
-                            Stuff.basic("Flour",5000),
-                            Stuff.basic("Pie",100)
+                            Stuff.quantum("Work", 5),
+                            Stuff.quantum("Flour", 5000),
+                            Stuff.quantum("Pie", 100)
                     }
             );
         }
@@ -29,43 +31,46 @@ public class Firm {
                     "Pole a.s.",
                     new Stuff[]{
                             Stuff.money(1000),
-                            Stuff.basic("Work",1000),
-                            Stuff.basic("Flour",5000),
-                            Stuff.machine("pole","Work", "Flour", 2)
+                            Stuff.quantum("Work", 1000),
+                            Stuff.quantum("Flour", 5000),
+                            Stuff.simpleMachine("pole", "Work", "Flour", 2)
                     }
             );
         }
     }
 
     private String firmID;
-    private Map<String,Stuff> inventory;
 
-    private double money; // protože se do nich šahá opravdu často,
-                          // nedáme je pro efektivitu do mapy 
+    private double money;
+    private Map<String,PluralStuff>   plInventory;
+    private Map<String,SingularStuff> sgInventory;
 
     private BasicChangeInformer changeInformer;
 
     public Firm (String firmID) {
         this.firmID = firmID;
-        inventory = new HashMap<>();
-        money = 0;
+
+        money       = 0;
+        plInventory = new HashMap<>();
+        sgInventory = new HashMap<>();
+
         changeInformer = new BasicChangeInformer();
     }
-
-
 
     public Firm (String firmID, Stuff[] stuffs) {
         this(firmID);
         for (Stuff s : stuffs) {
-            if (s.getName().equals("$")) { // todo lepší něco jako ".. instanceof ..money"
-                money += s.getNum();
-            } else {
-                inventory.put(s.getName(), s);
+            if (s instanceof Money) {
+                money += ((Money)s).getNum();
+            } else if (s instanceof PluralStuff) {
+                PluralStuff ps = (PluralStuff) s;
+                plInventory.put(ps.getComoName(), ps);
+            } else if (s instanceof SingularStuff) {
+                SingularStuff ss = (SingularStuff) s;
+                sgInventory.put(ss.getSgID(), ss);
             }
         }
     }
-
-
 
     public ChangeInformer getChangeInformer() {
         return changeInformer;
@@ -73,30 +78,42 @@ public class Firm {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("=== "+firmID+" ===\n");
-        sb.append("$ ... ").append(money).append("\n");
+        StringBuilder sb = new StringBuilder("=== "+firmID+" ===\n\n");
 
-        for (Map.Entry<String, Stuff> entry : inventory.entrySet()) {
-            String key = entry.getKey();
-            Stuff value = entry.getValue();
-
-            sb.append(key).append(" ... ").append(value.getNum());
-
-            //todo u mašin vypsat i machineID
-            //if (value instanceof )
-
-            sb.append("\n");
+        for (SingularStuff s : sgInventory.values()) {
+            sb.append( s.getSgID() ).append(" : ").append( s.getComoName() ).append("\n");
         }
 
-        //sb.append("... ").append( getInventoryDump() ).append("\n");
+        sb.append("\n");
+        sb.append("$ ... ").append(money).append("\n");
 
-        return sb.append("\n").toString();
+        for (Map.Entry<String, PluralStuff> e : plInventory.entrySet()) {
+            sb.append( e.getKey() ).append(" ... ").append( e.getValue().getNum() ).append("\n");
+        }
+
+        sb.append("\n");
+
+        return sb.toString();
     }
 
+
     public InventoryDump getInventoryDump() {
-        InventoryDump dump = new InventoryDump(inventory.entrySet());
-        dump.add(new InventoryDump("$", money));
+        InventoryDump dump;
+        dump =    new InventoryDump(plInventory.values())  ;
+        dump.add( new InventoryDump(sgInventory.values()) );
+        dump.add( new InventoryDump("$", money) );
         return dump;
+    }
+
+    public List<Commodity> getComos () {
+        List<Commodity> ret;
+        ret =       getComos(plInventory)  ;
+        ret.addAll( getComos(sgInventory) );
+        return ret;
+    }
+
+    private List<Commodity> getComos (Map<String,? extends Stuff> inventory) {
+        return inventory.values().stream().map(Stuff::getComo).collect(Collectors.toList());
     }
 
     public boolean hasEnoughMoney (double m) {
@@ -104,13 +121,12 @@ public class Firm {
     }
     
     public boolean hasEnoughCommodity(String comoName, double num) {
-        Stuff e = inventory.get(comoName);
+        PluralStuff e = plInventory.get(comoName);
         return e != null && e.getNum() >= num;
     }
 
+    //todo work method
     public double work (String machineID) {
-
-
 
         throw new UnsupportedOperationException();
     }
@@ -123,9 +139,9 @@ public class Firm {
     
     public double addCommodity (Commodity c, double delta) {
         double ret; // kolik je komodity po přidání
-        Stuff e = inventory.get(c.getName());
+        PluralStuff e = plInventory.get(c.getName());
         if (e == null) {
-            inventory.put(c.getName(), new Stuff.Basic(c,delta));
+            plInventory.put(c.getName(), new Quantum(c, delta));
             ret = delta;
         } else {
             ret = e.addNum(delta);
@@ -137,17 +153,14 @@ public class Firm {
     public String getFirmID () {
         return firmID;
     }
-    
-    public Map<String,Stuff> getInventoryMap () {
-        return inventory;
-    }
+
 
     public double getMoney() {
         return money;
     }
 
     public double getComoNum (String comoName) {
-        Stuff e = inventory.get(comoName);
+        PluralStuff e = plInventory.get(comoName);
         if (e == null) {return 0;}
         return e.getNum();
     }

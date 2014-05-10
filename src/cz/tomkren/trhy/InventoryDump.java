@@ -1,9 +1,17 @@
 package cz.tomkren.trhy;
 
 
-import java.util.*;
+import cz.tomkren.trhy.stuff.PluralStuff;
+import cz.tomkren.trhy.stuff.SingularStuff;
+import cz.tomkren.trhy.stuff.Stuff;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+// todo neřeší singular stuff
 public class InventoryDump {
 
     private Map<String,Double> dump;
@@ -26,28 +34,23 @@ public class InventoryDump {
         updateDump(key, val);
     }
 
-    public InventoryDump (Set<Map.Entry<String, Stuff>> set) {
+    public InventoryDump (Collection<? extends Stuff> xs) {
         this();
-        for (Map.Entry<String, Stuff> e  : set) {
-            updateDump(e.getKey(), e.getValue().getNum());
+        for (Stuff x : xs) {
+            updateDump(x.dumpKey(), x.dumpVal());
         }
     }
 
-    public static interface Dumpable {
-        Map.Entry<String,Double> dump();
-    }
-
-    public InventoryDump (Collection<? extends Dumpable> xs) {
+    public InventoryDump (Map<String,Double> dumpMap) {
         this();
-        for (Dumpable x : xs) {
-            Map.Entry<String,Double> e = x.dump();
+        for (Map.Entry<String,Double> e : dumpMap.entrySet()) {
             updateDump(e.getKey(), e.getValue());
         }
     }
 
     public List<String> getComoNames(boolean includeMoney, boolean includeMachines) {
         return dump.keySet().stream()
-                .filter(cName -> (includeMoney || !cName.equals("$")) && (includeMachines || !Machine.isMachineName(cName)) )
+                .filter(cName -> (includeMoney || !cName.equals("$")) && (includeMachines || !Utils.isMachineName(cName)))
                 .collect(Collectors.toList());
     }
 

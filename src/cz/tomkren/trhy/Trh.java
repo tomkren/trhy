@@ -2,6 +2,7 @@ package cz.tomkren.trhy;
 
 import cz.tomkren.observer.BasicChangeInformer;
 import cz.tomkren.observer.ChangeInformer;
+import cz.tomkren.trhy.stuff.Stuff;
 
 import java.util.*;
 
@@ -229,12 +230,7 @@ public class Trh {
         firms.put(firmID, hisFirm);
 
         // projdi všechny komodity a pokud pro ně ještě není trh tak ho udělej..
-        for (Map.Entry<String, Stuff> entry : hisFirm.getInventoryMap().entrySet()) {
-            String como = entry.getKey();
-            if (!tabs.containsKey(como)) {
-                addTabule(entry.getValue().getComo());
-            }
-        }
+        hisFirm.getComos().stream().filter(c -> !tabs.containsKey(c.getName())).forEach(this::addTabule);
 
         AIDs.add(agentID);
 

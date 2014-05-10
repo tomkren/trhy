@@ -4,7 +4,12 @@ import java.util.*;
 
 public class Utils {
 
-    public static final double EPSILON = 0.000000001;    // todo ještě líp udělat pomocí relativního epsilon..
+    // todo debilní hax
+    public static boolean isMachineName(String str) {
+        return str.contains("->");
+    }
+
+    public static final double EPSILON = 0.000000001;    // todo možná ještě líp udělat pomocí relativního epsilon..
     public static boolean isAlmostTheSame(double a, double b) {
         return a == b || Math.abs(a-b) < EPSILON;
     }
