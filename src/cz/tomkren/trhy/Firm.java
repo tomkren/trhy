@@ -49,7 +49,7 @@ public class Firm {
     }
 
     public static class WorkRes {
-        public enum Status {OK, KO_WRONG_ID, KO_NOT_MACHINE, KO_CHECK_INPUT_FAIL}
+        public enum Status {OK, KO_NOT_ENOUGH_INPUT, KO_WRONG_ID, KO_NOT_MACHINE, KO_CHECK_INPUT_FAIL}
 
         private Status status;
         private Stuff  output;
@@ -58,22 +58,26 @@ public class Firm {
             this.status = status;
             this.output = output;
         }
+        public Status getStatus() {
+            return status;
+        }
+        public Stuff  getOutput() {
+            return output;
+        }
 
         public static WorkRes ok(Stuff output) { return new WorkRes(Status.OK                  , output ); }
         public static WorkRes wrongID()        { return new WorkRes(Status.KO_WRONG_ID         , null   ); }
         public static WorkRes notMachine()     { return new WorkRes(Status.KO_NOT_MACHINE      , null   ); }
         public static WorkRes checkInputFail() { return new WorkRes(Status.KO_CHECK_INPUT_FAIL , null   ); }
+        public static WorkRes notEnoughInput() { return new WorkRes(Status.KO_NOT_ENOUGH_INPUT , null   ); }
+
 
     }
 
-
-
-
-    // todo : teď dělaný jakoby se output dodával zvenčí a zas se posílal ven, ale on se bere z firmy a taky se tam vrací...
     public WorkRes doWork (String machineID, Stuff input) {
 
-        // kontroly vstupu stroje (mám dost suroviny?)
-
+        // kontroly vstupu stroje 1 (mám dost suroviny?)
+        if (!hasEnoughStuff(input)) { return WorkRes.notEnoughInput(); }
 
         // kontroly stroje
         SingularStuff sgStuff = sgInventory.get(machineID);
@@ -83,9 +87,12 @@ public class Firm {
 
         Machine machine = (Machine) sgStuff;
 
-        if (!machine.checkInput(input))    { return WorkRes.checkInputFail(); }
+        // kontroly vstupu stroje 2 (pasuje surovina do stroje?)
+        if (!machine.checkInput(input)) { return WorkRes.checkInputFail(); }
 
         Stuff output = machine.work(input);
+
+        // todo odečíst a přičíst
 
         return WorkRes.ok(output);
     }
