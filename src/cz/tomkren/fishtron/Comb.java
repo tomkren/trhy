@@ -1,5 +1,11 @@
 package cz.tomkren.fishtron;
 import cz.tomkren.trhy.helpers.Log;
+
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -7,8 +13,30 @@ import java.util.function.Supplier;
 public interface Comb {
     public Comb ap(Comb comb);
 
-    default public Comb ap (int i) {
-        return ap(new Val<Integer>(i));
+    default public Comb ap (int     x) {
+        return ap(new Val<>(x));
+    }
+    default public Comb ap (double  x) {
+        return ap(new Val<>(x));
+    }
+    default public Comb ap (boolean x) {
+        return ap(new Val<>(x));
+    }
+    default public Comb ap (char    x) {
+        return ap(new Val<>(x));
+    }
+    default public Comb ap (String  x) {
+        return ap(new Val<>(x));
+    }
+    default public Comb ap (List<Object> x)  {
+        return ap(new Val<>(x));
+    }
+    default public Comb ap (Object... xs) {
+        return ap(new Val<>(list(xs)));
+    }
+
+    public static List<Object> list(Object... xs) {
+        return Arrays.asList(xs);
     }
 
     public static final Comb plus = new Fun2<Integer,Integer,Integer>("plus", (x,y)-> x+y);
@@ -17,8 +45,12 @@ public interface Comb {
     public static final Comb _1   = new Val<>(1);
     public static final Comb _2   = new Val<>(2);
     public static final Comb K_   = x -> (y -> x);
+    public static final Comb I    = mk("I", x -> x );
     public static final Comb K    = mk("K", x -> (y -> x) );
     public static final Comb S    = mk("S", f -> (g -> (x -> f.ap(x).ap(g.ap(x)) )));
+
+    public static final Comb cons = mk(":", x -> (xs ->  new Val2<>(x,xs) ) );
+    public static final Comb nil  = mk("[]", new Val<>(null) );
 
     public static Comb mk(String str, Comb f){
         return new Comb() {
@@ -111,6 +143,22 @@ public interface Comb {
         }
     }
 
+    public class Val2<A,B> implements Comb {
+        private A x;
+        private B y;
+        public Val2(A x, B y) {
+            this.x = x; this.y = y;
+        }
+        public A _1() { return x; }
+        public B _2() { return y; }
+        public Comb ap(Comb comb) {
+            throw new UnsupportedOperationException("Val<T> cannot by applied.");
+        }
+        @Override public String toString() {
+            return "<"+ x +","+ y +">";
+        }
+    }
+
     public static void main(String[] args) {
         Log.it("Hello Combinatorz!");
         Log.it( _0 );
@@ -134,6 +182,13 @@ public interface Comb {
         Log.it().it("S:");
         Log.it( "S K K    = "+ S.ap(K).ap(K)       );
         Log.it( "S K K 42 = "+ S.ap(K).ap(K).ap(42) );
+
+        Log.it( "[1, 2, 3] = "+ list(1, 2, 3)  );
+        Log.it( "[1, 2, 3] = "+ I.ap(1, 2, 3)  );
+        Log.it( "[1, 2, 3] = "+ I.ap(1, 2, 3)  );
+
+        Log.it().it("3 : [] = "+ cons.ap(3).ap(nil) );
+        //Log.it().it("1 : 2 : 3 : [] = "+ cons.ap() );
 
     }
 }
