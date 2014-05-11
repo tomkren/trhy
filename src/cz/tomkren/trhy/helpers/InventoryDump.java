@@ -1,11 +1,6 @@
 package cz.tomkren.trhy.helpers;
-
-
-import cz.tomkren.fishtron.Type;
-import cz.tomkren.trhy.stuff.Machine;
 import cz.tomkren.trhy.stuff.SimpleMachine;
 import cz.tomkren.trhy.stuff.Stuff;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -103,6 +98,7 @@ public class InventoryDump {
         return Utils.isAlmostTheSame( m.getBeta() , bDelta/aDelta );
     }
 
+    // todo odebrat ty logy a dát je na místa kde se používá tahle metoda
     public boolean compare(InventoryDump invDump2, boolean isSilent) {
 
         Map<String,Double> dump2 = invDump2.dump;

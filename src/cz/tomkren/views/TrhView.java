@@ -59,6 +59,9 @@ public class TrhView implements ChangeListener {
     private JCheckBox         includeMachinesCheckBox;
     private JButton showAllAllButton;
     private JButton EXITButton;
+    private JButton sendButton;
+    private JComboBox comboBox1;
+    private JTextField textField1;
 
 
     public TrhView(Trh t) {
