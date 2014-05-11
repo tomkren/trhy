@@ -11,9 +11,18 @@ public class SimpleMachine implements Machine, SingularStuff {
 
     public SimpleMachine(String machineID, double beta, Type.Arrow como) {
         this.machineID = machineID;
-        this.beta      = beta;
+        this.beta = beta;
         this.type = como;
     }
+
+    public Type.Arrow getType() {
+        return type;
+    }
+
+    public double getBeta() {
+        return beta;
+    }
+
 
     public boolean checkInput(Stuff input) {
         return (input instanceof Quantum) && input.getComo().equals(type.getInput());

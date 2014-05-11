@@ -32,7 +32,7 @@ public class OldConsoleMain {
             Log.it();
             Log.it(trh);
             InventoryDump trhInvDump2 = trh.getInventoryDump();
-            trhInvDump1.porovnej(trhInvDump2, false) ;
+            trhInvDump1.compare(trhInvDump2, false) ;
 
 
         } catch (Trh.TrhException e) {

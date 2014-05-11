@@ -96,7 +96,7 @@ public class TrhTester {
         trh.send(req);
 
         InventoryDump afterDump = trh.getInventoryDump();
-        return beforeDump.porovnej(afterDump, false);
+        return beforeDump.compare(afterDump, false);
     }
 
     public static final double P_OF_DUMP_PRICE = 0.1;

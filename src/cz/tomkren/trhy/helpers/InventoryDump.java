@@ -1,6 +1,9 @@
 package cz.tomkren.trhy.helpers;
 
 
+import cz.tomkren.fishtron.Type;
+import cz.tomkren.trhy.stuff.Machine;
+import cz.tomkren.trhy.stuff.SimpleMachine;
 import cz.tomkren.trhy.stuff.Stuff;
 
 import java.util.Collection;
@@ -13,6 +16,12 @@ import java.util.stream.Collectors;
 public class InventoryDump {
 
     private Map<String,Double> dump;
+
+    public double get(String key) {
+        Double val = dump.get(key);
+        if (val == null) {return 0;}
+        return val;
+    }
 
     public InventoryDump () {
         dump = new HashMap<>();
@@ -77,8 +86,24 @@ public class InventoryDump {
     }
 
 
+    // todo otestovat a použít někde
+    public boolean compareWorkChange (SimpleMachine m, InventoryDump after) {
 
-    public boolean porovnej(InventoryDump invDump2, boolean isSilent) {
+        String aComoName  = m.getType().getInput().toString();
+        String bComoName = m.getType().getOutput().toString();
+
+        double aBefore = get(aComoName);
+        double bBefore = get(bComoName);
+        double aAfter  = after.get(aComoName);
+        double bAfter  = after.get(bComoName);
+
+        double aDelta = aBefore - aAfter;
+        double bDelta = bAfter  - bBefore;
+
+        return Utils.isAlmostTheSame( m.getBeta() , bDelta/aDelta );
+    }
+
+    public boolean compare(InventoryDump invDump2, boolean isSilent) {
 
         Map<String,Double> dump2 = invDump2.dump;
 
