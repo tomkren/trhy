@@ -32,7 +32,6 @@ public interface Combinator {
         public Combinator apply(Combinator x) {
             return new Val<B>(f.apply(((Val<A>) x).get()));
         }
-
         @Override public String toString() {
             if (sym != null) {
                 return sym;
