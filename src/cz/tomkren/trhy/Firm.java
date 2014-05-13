@@ -44,8 +44,9 @@ public class Firm {
         }
     }
 
+    // TODO asi dát ven, jedna chyba (notOwner) je volána z venku (z Trh.java)
     public static class WorkRes {
-        public enum Status {OK, KO_NOT_ENOUGH_INPUT, KO_WRONG_ID, KO_NOT_MACHINE, KO_CHECK_INPUT_FAIL}
+        public enum Status {OK, KO_NOT_ENOUGH_INPUT, KO_WRONG_ID, KO_NOT_MACHINE, KO_CHECK_INPUT_FAIL, KO_NOT_OWNER}
 
         private Status status;
         private Stuff  output;
@@ -61,15 +62,25 @@ public class Firm {
             return output;
         }
 
+        @Override
+        public String toString() {
+            return "WorkRes{" +
+                    "status=" + status +
+                    ", output=" + output +
+                    '}';
+        }
+
         public static WorkRes ok(Stuff output) { return new WorkRes(Status.OK                  , output ); }
         public static WorkRes wrongID()        { return new WorkRes(Status.KO_WRONG_ID         , null   ); }
         public static WorkRes notMachine()     { return new WorkRes(Status.KO_NOT_MACHINE      , null   ); }
         public static WorkRes checkInputFail() { return new WorkRes(Status.KO_CHECK_INPUT_FAIL , null   ); }
         public static WorkRes notEnoughInput() { return new WorkRes(Status.KO_NOT_ENOUGH_INPUT , null   ); }
+        public static WorkRes notOwner()       { return new WorkRes(Status.KO_NOT_OWNER        , null   ); }
 
 
     }
 
+    // todo zevkusnit tam to kde je ted vsude changeInformer.informListeners();
     public WorkRes doWork (String machineID, Stuff input) {
 
         // kontroly vstupu stroje 1 (mám dost suroviny?)
@@ -78,13 +89,13 @@ public class Firm {
         // kontroly stroje
         SingularStuff sgStuff = sgInventory.get(machineID);
 
-        if (sgStuff == null)               { return WorkRes.wrongID();    }
-        if (!(sgStuff instanceof Machine)) { return WorkRes.notMachine(); }
+        if (sgStuff == null)               { changeInformer.informListeners(); return WorkRes.wrongID();    }
+        if (!(sgStuff instanceof Machine)) { changeInformer.informListeners(); return WorkRes.notMachine(); }
 
         Machine machine = (Machine) sgStuff;
 
         // kontroly vstupu stroje 2 (pasuje surovina do stroje?)
-        if (!machine.checkInput(input)) { return WorkRes.checkInputFail(); }
+        if (!machine.checkInput(input)) { changeInformer.informListeners(); return WorkRes.checkInputFail(); }
 
         Stuff output = machine.work(input);
 
@@ -92,6 +103,7 @@ public class Firm {
         subtractCommodity(input);
         addCommodity(output);
 
+        changeInformer.informListeners();
         return WorkRes.ok(output);
     }
 

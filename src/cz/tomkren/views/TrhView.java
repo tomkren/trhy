@@ -57,11 +57,13 @@ public class TrhView implements ChangeListener {
     private JButton           sendRandTransButton;
     private JSpinner          nSpinner;
     private JCheckBox         includeMachinesCheckBox;
-    private JButton showAllAllButton;
-    private JButton EXITButton;
-    private JButton sendButton;
-    private JComboBox comboBox1;
-    private JTextField textField1;
+
+    private JButton           showAllAllButton;
+    private JButton           EXITButton;
+
+    private JButton sendOneDoWorkButton;
+    private JTextField inputNumTextField;
+    private JTextField midTextField;
 
 
     public TrhView(Trh t) {
@@ -90,7 +92,11 @@ public class TrhView implements ChangeListener {
         buyOrSellComboBox    .addActionListener(e -> buyOrSell());
         sendTransactionButton.addActionListener(e -> sendTransaction() );
         quickOrSlowComboBox  .addActionListener(e -> quickOrSlow());
+
+        sendOneDoWorkButton.addActionListener(e -> sendOneDoWork());
     }
+
+
 
     private void sendRandTrans(TrhTester trhTester) {
         int n = (Integer) nSpinner.getValue();
@@ -160,6 +166,27 @@ public class TrhView implements ChangeListener {
     private void buyOrSell() {
         boolean isBuy = "BUY".equals(buyOrSellComboBox.getSelectedItem());
         transRestLabel.setText( isBuy ? "#$:" : "#:" );
+    }
+
+    private void sendOneDoWork() {
+        // todo DRY v sendTransaction ten samej kod
+        String aid           = (String) transAidComboBox.getSelectedItem();
+        String fid           = (String) transFidComboBox.getSelectedItem();
+        String inputComoName = (String) transComoComboBox.getSelectedItem();
+
+        String mid = midTextField.getText();
+
+        double inputNum;
+        try {
+            inputNum = Double.parseDouble(inputNumTextField.getText());
+        } catch (NumberFormatException ex) {
+            inputNum = 0;
+        }
+
+        trh.doWork(aid, fid, mid, inputComoName, inputNum);
+
+        //todo otestovat tim testem InventoryDump.compareWorkChange(SimpleMachine m, InventoryDump after)
+
     }
 
     private void sendTransaction() {

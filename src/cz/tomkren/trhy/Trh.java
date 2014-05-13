@@ -4,6 +4,8 @@ import cz.tomkren.observer.BasicChangeInformer;
 import cz.tomkren.observer.ChangeInformer;
 import cz.tomkren.trhy.helpers.InventoryDump;
 import cz.tomkren.trhy.helpers.Log;
+import cz.tomkren.trhy.stuff.Quantum;
+import cz.tomkren.trhy.stuff.Stuff;
 
 import java.util.*;
 
@@ -55,6 +57,20 @@ public class Trh {
 
 
 //~~~~ ~~~~~ ~~~~ ~~~~~ ~~~~ ~~ ~~~~~ ~~~~~ ~~~~~~ ~~~~~ ~~~~
+
+    public Firm.WorkRes doWork (String aid, String fid, String mid, String inputComoName, double inputNum) {
+        if (!isOwner(aid,fid)) {
+            return Firm.WorkRes.notOwner(); // todo asi by mělo bejt WorkRes ven z Firm, když jedna jeji chyba se odehravá venku
+        }
+        Firm firm = getFirm(fid);
+        Firm.WorkRes workRes = firm.doWork(mid, Stuff.quantum(inputComoName, inputNum) );
+
+        log("WORK "+aid+" "+fid+" "+mid+" "+inputComoName+" "+inputNum);
+
+        log("  "+ workRes.toString() );
+        finalizeAction();
+        return workRes;
+    }
 
     // výstup metody send je, aby pak agent trhu mohl informovat agenty manažírků.
     public List<Trans.Res> send (Trans.Req req) {
