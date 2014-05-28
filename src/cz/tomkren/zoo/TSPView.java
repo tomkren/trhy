@@ -1,24 +1,47 @@
 package cz.tomkren.zoo;
 
 
+import cz.tomkren.trhy.helpers.Log;
+
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
+import java.util.function.BiConsumer;
 
 public class TSPView {
 
     private TSP tsp;
+    private MyFrame myFrame;
 
     public TSPView (TSP tsp) {
         this.tsp = tsp;
-        new TSPControl(tsp);
+        new TSPControl(tsp, this);
         run();
+    }
+
+    public void drawPath (int[] path, Color c) {
+
+        Log.it("path (len = "+ tsp.pathLen(path) +") :" + Arrays.toString(path));
+
+        myFrame.myPaint( (g,alpha) -> drawPath(g, alpha, path, c) );
+
+    }
+
+    private void drawPath (Graphics2D g, double alpha, int[] path, Color c) {
+        int n = path.length;
+        for (int i = 0; i < n; i++) {
+            Point from = tsp.getPoint(path[i%n]);
+            Point to   = tsp.getPoint(path[(i+1)%n]);
+            drawLine(g, alpha, from, to, c);
+        }
+
     }
 
 
     private void run() {
         SwingUtilities.invokeLater(() -> {
-            MyFrame ps = new MyFrame();
-            ps.setVisible(true);
+            myFrame = new MyFrame();
+            myFrame.setVisible(true);
         });
     }
 
@@ -41,19 +64,21 @@ public class TSPView {
     }
 
     private void drawLine(Graphics2D g, double alpha, TSPGraph.EdgeInfo e) {
-        int x1 = (int)( alpha * e.getFrom().x );
-        int y1 = (int)( alpha * e.getFrom().y );
-        int x2 = (int)( alpha * e.getTo().x   );
-        int y2 = (int)( alpha * e.getTo().y   );
-        g.setColor(Color.lightGray);
+        drawLine(g,alpha, e.getFrom(), e.getTo(), Color.lightGray);
+    }
+
+    private void drawLine(Graphics2D g, double alpha, Point from, Point to, Color c) {
+        int x1 = (int)( alpha * from.x );
+        int y1 = (int)( alpha * from.y );
+        int x2 = (int)( alpha * to.x   );
+        int y2 = (int)( alpha * to.y   );
+        g.setColor(c);
         g.drawLine(x1,y1,x2,y2);
     }
 
     private class MyPanel extends JPanel {
 
-        private void doDrawing(Graphics gr) {
-            Graphics2D g = (Graphics2D) gr;
-            double alpha = (double)(getMySize().x-10) / (double)getMaxCorner();
+        private void doDrawing(Graphics2D g, double alpha) {
 
             for (TSPGraph.EdgeInfo e : tsp.getEdges()) {
                 drawLine(g, alpha, e);
@@ -62,6 +87,10 @@ public class TSPView {
             for (Point p : tsp.getPoints()){
                 drawCircle(g, alpha,p, 6, Color.gray, Color.black);
             }
+        }
+
+        private double getAlpha() {
+            return (double)(getMySize().x-10) / (double)getMaxCorner();
         }
 
         private Point getMySize() {
@@ -75,18 +104,35 @@ public class TSPView {
         @Override
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
-            doDrawing(g);
+            doDrawing((Graphics2D) g, getAlpha());
+        }
+
+        public void myPaint(BiConsumer<Graphics2D,Double> f) {
+
+            Graphics2D g = (Graphics2D) getGraphics();
+            double alpha = getAlpha();
+
+            super.paintComponent(g);
+            doDrawing(g, alpha );
+            f.accept( g, alpha );
         }
     }
 
 
     private class MyFrame extends JFrame {
+        private MyPanel myPanel;
+
         public MyFrame() {
             setTitle("TSPView");
             setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-            add(new MyPanel());
-            setSize(720, 720);
+            myPanel = new MyPanel();
+            add(myPanel);
+            setSize(720, 800);
             setLocationRelativeTo(null);
+        }
+
+        public void myPaint(BiConsumer<Graphics2D,Double> f) {
+            myPanel.myPaint(f);
         }
     }
 
