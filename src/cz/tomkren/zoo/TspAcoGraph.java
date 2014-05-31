@@ -1,12 +1,16 @@
 package cz.tomkren.zoo;
 
 
+import cz.tomkren.trhy.helpers.Log;
+
 import java.awt.Point;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
-public class TSPGraph {
+public class TspAcoGraph {
 
     private int n;
     private Point[] points;
@@ -25,7 +29,8 @@ public class TSPGraph {
     private int[]  bestPath;
     private double bestLen;
 
-    public TSPGraph(Point[] ps, TSP.Opts opts) {
+    public TspAcoGraph(Point[] ps, TSP.Opts opts) {
+
         points = ps;
         n = points.length;
         matrix = new EdgeData[n][n];
@@ -39,6 +44,10 @@ public class TSPGraph {
 
         rand = new Random();
 
+        init();
+    }
+
+    private void init() {
         iteration = 0;
         bestPath = null;
         bestLen = Double.POSITIVE_INFINITY;
@@ -47,7 +56,7 @@ public class TSPGraph {
             Point from = points[i];
             for (int j=i+1; j<n; j++){
                 Point to = points[j];
-                matrix[i][j] = new EdgeData(opts.getTauMin(), eucDistance(from,to) );
+                matrix[i][j] = new EdgeData(tauMax, eucDistance(from,to) );
             }
         }
     }
@@ -60,6 +69,70 @@ public class TSPGraph {
         }
     }
 
+    public void run(int numIterations, Consumer<TSP.IterationInfo> logFun) {
+        init();
+
+        for (int i = 0; i < numIterations; i++) {
+            int[] path = doOneIteration();
+
+            String msg = "!: "+ iteration;
+            logFun.accept( new TSP.IterationInfo(path ,msg, iteration) );
+        }
+
+    }
+
+    private void the2opt(int[] path) {
+        //todo Q: Může se stát, že kvůli modifikacím některý dvojice zkontroluju víc než jednou a některý ani jednou?
+
+        int tries = 0;
+        boolean modified = true;
+
+        while (modified && tries < 3) {
+
+            modified = false;
+            tries++;
+
+            for (int i = 0; i < n - 1; i++) {
+                for (int j = i + 2; j < n; j++) {
+                    if (!isOk2opt(path, i, j)) {
+                        swap2opt(path, i, j);
+                        modified = true;
+                    }
+                }
+            }
+
+        }
+    }
+
+    private boolean isOk2opt(int[] path, int i, int j) {
+        int from1 = path[i];
+        int to1   = path[i+1];
+        int from2 = path[j];
+        int to2   = path[(j+1)%n];
+
+        double distNow = get( from1, to1   ).dist + get( from2, to2 ).dist;
+        double distAlt = get( from1, from2 ).dist + get( to1  , to2 ).dist;
+
+        return distNow < distAlt;
+    }
+
+    private void swap2opt(int[] path, int i, int j) {
+        int begin = i+1;
+        int end   = j;
+        int temp;
+
+        while (begin<end) {
+            temp        = path[begin];
+            path[begin] = path[end];
+            path[end]   = temp;
+
+            begin++;
+            end--;
+        }
+    }
+
+
+
     public int[] doOneIteration() {
 
         int[]  itBestPath = null;
@@ -68,6 +141,7 @@ public class TSPGraph {
         // vygeneruj nové cesty
         for (int i=0; i<numAnts; i++) {
             int[] path = findPath();
+            the2opt(path);
             double len = pathLen(path);
 
             if (len < itBestLen) {
@@ -91,19 +165,7 @@ public class TSPGraph {
 
         // update along best path
 
-        boolean useGlobalBest;
-
-        if (iteration < 25) {
-            useGlobalBest = false;
-        } else if (iteration < 75) {
-            useGlobalBest = (iteration%5 == 0);
-        } else if (iteration < 125) {
-            useGlobalBest = (iteration%3 == 0);
-        } else if (iteration < 250) {
-            useGlobalBest = (iteration%2 == 0);
-        } else {
-            useGlobalBest = true;
-        }
+        boolean useGlobalBest = decideUseGlobalBest(iteration);
 
         double  delta;
         int[]   updatePath;
@@ -133,6 +195,22 @@ public class TSPGraph {
     }
 
 
+    private boolean decideUseGlobalBest(int iteration) {
+
+        if (iteration < 25) {
+            return false;
+        } else if (iteration < 75) {
+            return (iteration%5 == 0);
+        } else if (iteration < 125) {
+            return (iteration%3 == 0);
+        } else if (iteration < 250) {
+            return (iteration%2 == 0);
+        } else {
+            return true;
+        }
+
+    }
+
     private double checkInRange(double tau) {
         if (tau < tauMin) {return tauMin;}
         if (tau > tauMax) {return tauMax;}
@@ -146,6 +224,7 @@ public class TSPGraph {
         }
         return sum;
     }
+
 
     public int[] findPath() {
         int[] path = new int[n];
@@ -166,7 +245,6 @@ public class TSPGraph {
 
         return path;
     }
-
 
     private int nextNode(int i, Set<Integer> beenThere) {
         double[] p = new double[n];

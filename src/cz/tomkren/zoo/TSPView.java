@@ -19,11 +19,11 @@ public class TSPView {
         run();
     }
 
-    public void drawPath (int[] path, Color c) {
+    public void drawPath (int[] path, Color c, boolean drawAllEdges) {
 
         Log.it("path (len = "+ tsp.pathLen(path) +") :" + Arrays.toString(path));
 
-        myFrame.myPaint( (g,alpha) -> drawPath(g, alpha, path, c) );
+        myFrame.myPaint( (g,alpha) -> drawPath(g, alpha, path, c),drawAllEdges );
 
     }
 
@@ -63,7 +63,7 @@ public class TSPView {
         g.drawOval(x, y, r, r);
     }
 
-    private void drawLine(Graphics2D g, double alpha, TSPGraph.EdgeInfo e) {
+    private void drawLine(Graphics2D g, double alpha, TspAcoGraph.EdgeInfo e) {
         drawLine(g,alpha, e.getFrom(), e.getTo(), Color.lightGray);
     }
 
@@ -78,10 +78,12 @@ public class TSPView {
 
     private class MyPanel extends JPanel {
 
-        private void doDrawing(Graphics2D g, double alpha) {
+        private void doDrawing(Graphics2D g, double alpha, boolean drawAllEdges) {
 
-            for (TSPGraph.EdgeInfo e : tsp.getEdges()) {
-                drawLine(g, alpha, e);
+            if (drawAllEdges) {
+                for (TspAcoGraph.EdgeInfo e : tsp.getEdges()) {
+                    drawLine(g, alpha, e);
+                }
             }
 
             for (Point p : tsp.getPoints()){
@@ -104,16 +106,16 @@ public class TSPView {
         @Override
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
-            doDrawing((Graphics2D) g, getAlpha());
+            doDrawing((Graphics2D) g, getAlpha(), true);
         }
 
-        public void myPaint(BiConsumer<Graphics2D,Double> f) {
+        public void myPaint(BiConsumer<Graphics2D,Double> f, boolean drawAllEdges) {
 
             Graphics2D g = (Graphics2D) getGraphics();
             double alpha = getAlpha();
 
             super.paintComponent(g);
-            doDrawing(g, alpha );
+            doDrawing(g, alpha, drawAllEdges);
             f.accept( g, alpha );
         }
     }
@@ -131,8 +133,8 @@ public class TSPView {
             setLocationRelativeTo(null);
         }
 
-        public void myPaint(BiConsumer<Graphics2D,Double> f) {
-            myPanel.myPaint(f);
+        public void myPaint(BiConsumer<Graphics2D,Double> f, boolean drawAllEdges) {
+            myPanel.myPaint(f, drawAllEdges);
         }
     }
 
