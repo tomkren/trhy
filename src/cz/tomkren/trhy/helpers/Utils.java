@@ -31,5 +31,9 @@ public class Utils {
         return null;
     }
 
+    public static double U(Random rand, double a, double b) {
+        return a + (b-a) * rand.nextDouble();
+    }
+
 
 }

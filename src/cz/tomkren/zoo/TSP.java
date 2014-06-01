@@ -6,40 +6,23 @@ import java.util.function.Consumer;
 
 public class TSP {
 
-    public static class Opts {
-        private int    numAnts;
-        private double evaporationRate;
-        private double alpha;
-        private double beta;
-        private double tauMax;
-        private double tauMin;
+    public static void main(String[] args) {
 
-        public Opts(int numAnts, double evaporationRate, double alpha, double beta, double tauMax, double tauMin) {
-            this.numAnts = numAnts;
-            this.evaporationRate = evaporationRate;
-            this.alpha = alpha;
-            this.beta = beta;
-            this.tauMax = tauMax;
-            this.tauMin = tauMin;
-        }
-        public int getNumAnts() {
-            return numAnts;
-        }
-        public double getEvaporationRate() {
-            return evaporationRate;
-        }
-        public double getAlpha() {
-            return alpha;
-        }
-        public double getBeta() {
-            return beta;
-        }
-        public double getTauMax() {
-            return tauMax;
-        }
-        public double getTauMin() {
-            return tauMin;
-        }
+        Solver test1 = AcoTsp.mk(OLIVER_30, 423.741);
+        Solver test2 = AcoTsp.mk(PR_76, 108159.0);
+        Solver test3 = AcoTsp.mk(TSP_225, 391900);
+
+        new TSPView(test3);
+    }
+
+    public static interface Solver {
+        public void run(int numIterations, Consumer<IterationInfo> logFun);
+        public int[] doOneIteration();
+        public int[] findPath();
+        public Point[] getPoints();
+        public Point getPoint(int i);
+        public double pathLen(int[] path);
+        public EdgeInfo[] getEdgeInfos();
     }
 
     public static class IterationInfo {
@@ -63,14 +46,32 @@ public class TSP {
         }
     }
 
-    private TspAcoGraph graph;
+    public static class EdgeInfo {
+        private Point  from;
+        private Point  to;
+        private double eta;
 
-    public TSP (Opts opts, int[] euc2d) {
-        graph = new TspAcoGraph(mkPoints(euc2d), opts);
+        public EdgeInfo(Point from, Point to, double eta) {
+            this.from = from;
+            this.to = to;
+            this.eta = eta;
+        }
+        public Point getFrom() {
+            return from;
+        }
+        public Point getTo() {
+            return to;
+        }
+        public double getEta() {
+            return eta;
+        }
     }
 
-    public void run(int numIterations, Consumer<IterationInfo> logFun) {
-        graph.run(numIterations, logFun);
+
+    public static double eucDistance(Point a, Point b) {
+        double dx = a.x - b.x;
+        double dy = a.y - b.y;
+        return Math.sqrt(dx*dx + dy*dy);
     }
 
     private static Point[] mkPoints(int[] euc2d){
@@ -88,70 +89,16 @@ public class TSP {
         return points;
     }
 
-    public int[] doOneIteration() {
-        return graph.doOneIteration();
-    }
-
-    public int[] findPath() {
-        return graph.findPath();
-    }
-
-    public Point[] getPoints() {
-        return graph.getPoints();
-    }
-
-    public Point getPoint(int i) {
-        return graph.getPoint(i);
-    }
-
-    public double pathLen(int[] path) {
-        return graph.pathLen(path);
-    }
-
-    public TspAcoGraph.EdgeInfo[] getEdges() {
-        return graph.getEdgeInfos();
-    }
-
-    //haxy!!!
-    public static final double OPT_VAL_HAX = 423.741;//108159.0;
-    public static final double N_HAX       = 30;     //76.0;
-
-
-    public static final int    NUM_ANTS = 25;
-    public static final double RHO      = 0.2;
-    public static final double ALPHA    = 1.0;
-    public static final double BETA     = 2.0;
-    public static final double TAU_MAX  = (1./RHO)*(1./OPT_VAL_HAX);
-    public static final double TAU_MIN  = TAU_MAX/(2.*N_HAX);
-
-
-
-    public static final Opts DEFAULT_OPTS = new Opts(NUM_ANTS,RHO,ALPHA,BETA,TAU_MIN,TAU_MAX);
-
-    public static Opts mkDefaultOpts(double optVal, double n) {
-
-        double tau_max  = (1./RHO)*(1./optVal);
-        double tau_min  = tau_max/(2.*n);
-
-        return new Opts(NUM_ANTS,RHO,ALPHA,BETA,tau_min,tau_max);
-    }
-
-    public static void main(String[] args) {
-
-        // oliver30
-        TSP test1 = new TSP( mkDefaultOpts(423.741, 30), new int[]{
+    public static final Point[] OLIVER_30 = mkPoints(new int[]{
             54, 67,   54, 62,   37, 84,    41, 94,    2, 99,
-             7, 64,   25, 62,   22, 60,    18, 54,    4, 50,
+            7, 64,   25, 62,   22, 60,    18, 54,    4, 50,
             13, 40,   18, 40,   24, 42,    25, 38,    44, 35,
             41, 26,   45, 21,   58, 35,    62, 32,    82,  7,
             91, 38,   83, 46,   71, 44,    64, 60,    68, 58,
             83, 69,   87, 76,    74, 78,   71, 71,    58, 69
-        });
+    });
 
-
-
-        // pr76.tsp
-        TSP test2 = new TSP( mkDefaultOpts(108159.0, 76.0), new int[]{
+    public static final Point[] PR_76 = mkPoints(new int[]{
             3600, 2300,     3100, 3300,     4700, 5750,     5400, 5750,
             5608, 7103,     4493, 7102,     3600, 6950,     3100, 7250,
             4700, 8450,     5400 , 8450,    5610 , 10053,   4492 , 10052,
@@ -171,10 +118,9 @@ public class TSP {
             16800, 7250,    16150, 6950,    16800, 3300,    16150, 2300,
             14900, 1600,    19800, 800,     19800, 10000,   19800, 11900,
             19800, 12200,   200  , 12200,   200  , 1100,    200  , 800
-        });
+    });
 
-        //tsp225
-        TSP test3 = new TSP( mkDefaultOpts(391900, 225), new int[] {
+    public static final Point[] TSP_225 = mkPoints(new int[]{
             15542,15065,   37592,16465,   18392,15065,   20542,15065,   20542,17165,
             22642,17165,   22642,18615,   22642,20715,   22642,23565,   22642,26415,
             22642,29265,   22642,31415,   22642,33565,   20542,33565,   19092,33565,
@@ -220,11 +166,6 @@ public class TSP {
             47042,34565,   52542,25015,   54692,33565,   52542,26115,   52542,35665,
             33642,29865,   33642,31315,   29342,13615,   33642,30615,   42592,26415,
             39142,35365,   48292,33565,   42992,16765,   33092,15065,   36842,15065
-        });
-
-        new TSPView(test3);
-
-
-    }
+    });
 
 }

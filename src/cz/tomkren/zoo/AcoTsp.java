@@ -1,16 +1,69 @@
 package cz.tomkren.zoo;
 
 
-import cz.tomkren.trhy.helpers.Log;
-
 import java.awt.Point;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
-public class TspAcoGraph {
+public class AcoTsp implements TSP.Solver {
+
+    public static final int    NUM_ANTS = 25;
+    public static final double RHO      = 0.2;
+    public static final double ALPHA    = 1.0;
+    public static final double BETA     = 2.0;
+
+
+    public static AcoTsp mk(Point[] points, double optVal) {
+        return new AcoTsp( points, mkDefaultOpts(optVal, points.length) );
+    }
+
+    public static Opts mkDefaultOpts(double optVal, double n) {
+
+        double tau_max  = (1./RHO)*(1./optVal);
+        double tau_min  = tau_max/(2.*n);
+
+        return new Opts(NUM_ANTS,RHO,ALPHA,BETA,tau_min,tau_max);
+    }
+
+    public static class Opts {
+        private int    numAnts;
+        private double evaporationRate;
+        private double alpha;
+        private double beta;
+        private double tauMax;
+        private double tauMin;
+
+        public Opts(int numAnts, double evaporationRate, double alpha, double beta, double tauMax, double tauMin) {
+            this.numAnts = numAnts;
+            this.evaporationRate = evaporationRate;
+            this.alpha = alpha;
+            this.beta = beta;
+            this.tauMax = tauMax;
+            this.tauMin = tauMin;
+        }
+        public int getNumAnts() {
+            return numAnts;
+        }
+        public double getEvaporationRate() {
+            return evaporationRate;
+        }
+        public double getAlpha() {
+            return alpha;
+        }
+        public double getBeta() {
+            return beta;
+        }
+        public double getTauMax() {
+            return tauMax;
+        }
+        public double getTauMin() {
+            return tauMin;
+        }
+    }
+
+
 
     private int n;
     private Point[] points;
@@ -29,7 +82,7 @@ public class TspAcoGraph {
     private int[]  bestPath;
     private double bestLen;
 
-    public TspAcoGraph(Point[] ps, TSP.Opts opts) {
+    public AcoTsp(Point[] ps, Opts opts) {
 
         points = ps;
         n = points.length;
@@ -56,7 +109,7 @@ public class TspAcoGraph {
             Point from = points[i];
             for (int j=i+1; j<n; j++){
                 Point to = points[j];
-                matrix[i][j] = new EdgeData(tauMax, eucDistance(from,to) );
+                matrix[i][j] = new EdgeData(tauMax, TSP.eucDistance(from,to) );
             }
         }
     }
@@ -279,11 +332,7 @@ public class TspAcoGraph {
         throw new Error("ERR in nextNode...");
     }
 
-    private static double eucDistance(Point a, Point b) {
-        double dx = a.x - b.x;
-        double dy = a.y - b.y;
-        return Math.sqrt(dx*dx + dy*dy);
-    }
+
 
     public Point[] getPoints() {
         return points;
@@ -293,8 +342,8 @@ public class TspAcoGraph {
         return points[i];
     }
 
-    public EdgeInfo[] getEdgeInfos() {
-        EdgeInfo[] ret = new EdgeInfo[(n*(n-1))/2];
+    public TSP.EdgeInfo[] getEdgeInfos() {
+        TSP.EdgeInfo[] ret = new TSP.EdgeInfo[(n*(n-1))/2];
 
         int k = 0;
 
@@ -302,7 +351,7 @@ public class TspAcoGraph {
             Point from = points[i];
             for (int j=i+1; j<n; j++){
                 Point to = points[j];
-                ret[k] = new EdgeInfo(from, to, matrix[i][j].getEta());
+                ret[k] = new TSP.EdgeInfo(from, to, matrix[i][j].getEta());
                 k++;
             }
         }
@@ -338,29 +387,7 @@ public class TspAcoGraph {
         }
     }
 
-    public static class EdgeInfo {
-        private Point  from;
-        private Point  to;
-        private double eta;
 
-        private EdgeInfo(Point from, Point to, double eta) {
-            this.from = from;
-            this.to = to;
-            this.eta = eta;
-        }
-
-        public Point getFrom() {
-            return from;
-        }
-
-        public Point getTo() {
-            return to;
-        }
-
-        public double getEta() {
-            return eta;
-        }
-    }
 
 
 }

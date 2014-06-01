@@ -16,7 +16,7 @@ public class TSPControl {
     private JButton runButton;
     private JTextField numItersTextField;
 
-    public TSPControl(TSP tsp, TSPView tspView) {
+    public TSPControl(TSP.Solver tsp, TSPView tspView) {
 
         JFrame frame = new JFrame("TSPControl");
         frame.setContentPane(mainPanel);

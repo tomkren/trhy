@@ -10,10 +10,10 @@ import java.util.function.BiConsumer;
 
 public class TSPView {
 
-    private TSP tsp;
+    private TSP.Solver tsp;
     private MyFrame myFrame;
 
-    public TSPView (TSP tsp) {
+    public TSPView (TSP.Solver tsp) {
         this.tsp = tsp;
         new TSPControl(tsp, this);
         run();
@@ -63,7 +63,7 @@ public class TSPView {
         g.drawOval(x, y, r, r);
     }
 
-    private void drawLine(Graphics2D g, double alpha, TspAcoGraph.EdgeInfo e) {
+    private void drawLine(Graphics2D g, double alpha, TSP.EdgeInfo e) {
         drawLine(g,alpha, e.getFrom(), e.getTo(), Color.lightGray);
     }
 
@@ -81,7 +81,7 @@ public class TSPView {
         private void doDrawing(Graphics2D g, double alpha, boolean drawAllEdges) {
 
             if (drawAllEdges) {
-                for (TspAcoGraph.EdgeInfo e : tsp.getEdges()) {
+                for (TSP.EdgeInfo e : tsp.getEdgeInfos()) {
                     drawLine(g, alpha, e);
                 }
             }
