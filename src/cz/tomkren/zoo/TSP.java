@@ -12,7 +12,13 @@ public class TSP {
         Solver test2 = AcoTsp.mk(PR_76, 108159.0);
         Solver test3 = AcoTsp.mk(TSP_225, 391900);
 
+
+        //Solver test4 = PsoTsp.mk(OLIVER_30);
+        //Solver test5 = PsoTsp.mk(PR_76);
+        Solver test6 = PsoTsp.mk(TSP_225);
+
         new TSPView(test3);
+        new TSPView(test6);
     }
 
     public static interface Solver {

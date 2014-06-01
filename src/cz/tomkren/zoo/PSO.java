@@ -19,7 +19,8 @@ public class PSO {
                 0.9, // omega
                 1,   // phi_p
                 1,   // phi_g
-                2.5  // v_max
+                2.5,  // v_max
+                0    // phi_rand
         );
 
         PSO pso = new PSO(psoOpts);
@@ -50,8 +51,9 @@ public class PSO {
         private double omega;
         private double phi_p;
         private double phi_g;
+        private double phi_rand;
         private double v_max;
-        public Opts(Fitness fitness, int numParticles, int n, double[] mins, double[] maxs, double omega, double phi_p, double phi_g, double v_max) {
+        public Opts(Fitness fitness, int numParticles, int n, double[] mins, double[] maxs, double omega, double phi_p, double phi_g, double v_max, double phi_rand) {
             this.fitness = fitness;
             this.numParticles = numParticles;
             this.n = n;
@@ -61,6 +63,7 @@ public class PSO {
             this.phi_p = phi_p;
             this.phi_g = phi_g;
             this.v_max = v_max;
+            this.phi_rand = phi_rand;
         }
         public Fitness getFitness() {
             return fitness;
@@ -88,6 +91,9 @@ public class PSO {
         }
         public double getV_max() {
             return v_max;
+        }
+        public double getPhi_rand() {
+            return phi_rand;
         }
     }
 
@@ -144,6 +150,7 @@ public class PSO {
     private double   phi_p;
     private double   phi_g;
     private double   v_max;
+    private double   phi_rand;
 
 
 
@@ -160,7 +167,7 @@ public class PSO {
         phi_p = opts.getPhi_p();
         phi_g = opts.getPhi_g();
         v_max = opts.getV_max();
-
+        phi_rand = opts.getPhi_rand();
 
         init();
 
@@ -183,7 +190,7 @@ public class PSO {
         }
     }
 
-    private Particle initParticle() {
+    public Particle initParticle() {
         double[] pos = new double[n];
         double[] v   = new double[n];
         for (int i = 0; i < n; i++) {
@@ -199,6 +206,10 @@ public class PSO {
         return new Particle(pos, v, pos.clone(), fitVal);
     }
 
+
+    public double[] getBest() {
+        return best_g;
+    }
 
     public Particle[] getParticles() {
         return particles;
@@ -229,7 +240,8 @@ public class PSO {
                                 // std varianta to dela v opačném pořadí, nejdřív update v pak až pos
 
                 v[i] = omega * v[i] + phi_p*r_p*(best_p[i]-pos[i])
-                                    + phi_g *r_g*(best_g[i]-pos[i]) ;
+                                    + phi_g *r_g*(best_g[i]-pos[i])
+                                    + phi_rand * rand.nextDouble();
             }
 
             checkAndAdjustV(v);
