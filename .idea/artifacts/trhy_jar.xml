@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="trhy:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/trhy_jar</output-path>
+    <root id="archive" name="trhy.jar">
+      <element id="module-output" name="trhy" />
+    </root>
+  </artifact>
+</component>
