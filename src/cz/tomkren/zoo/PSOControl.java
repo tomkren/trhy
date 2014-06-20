@@ -31,7 +31,7 @@ public class PSOControl {
 
         runButton.addActionListener(e -> {
             int numIters = Integer.parseInt(numItersTextField.getText());;
-            for (int i = 0; i < 1000; i++) {
+            for (int i = 0; i < numIters; i++) {
                 pso.doOneIteration();
                 psoView.draw();
             }

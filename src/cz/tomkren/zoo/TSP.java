@@ -8,17 +8,17 @@ public class TSP {
 
     public static void main(String[] args) {
 
-        Solver test1 = AcoTsp.mk(OLIVER_30, 423.741);
-        Solver test2 = AcoTsp.mk(PR_76, 108159.0);
-        Solver test3 = AcoTsp.mk(TSP_225, 391900);
+        int testCase = 1;
 
+        if (testCase == 1) { runTest(OLIVER_30, 423.741  ); }
+        if (testCase == 2) { runTest(PR_76,     108159   ); }
+        if (testCase == 3) { runTest(TSP_225,   391900   ); }
 
-        //Solver test4 = PsoTsp.mk(OLIVER_30);
-        //Solver test5 = PsoTsp.mk(PR_76);
-        Solver test6 = PsoTsp.mk(TSP_225);
+    }
 
-        new TSPView(test3);
-        new TSPView(test6);
+    private static void runTest(Point[] points, double optVal) {
+        new TSPView( AcoTsp.mk(points, optVal) );
+        new TSPView( PsoTsp.mk(points) );
     }
 
     public static interface Solver {
